@@ -1,2 +1,50 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Add smooth scrolling behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Improve focus styles for accessibility */
+*:focus-visible {
+  outline: 2px solid #6d28d9;
+  outline-offset: 2px;
+}
+
+/* Add hover effects for cards */
+.card {
+  transition: all 0.3s ease;
+}
+
+/* Apply subtle transitions to all interactive elements */
+a, button, input, select, textarea {
+  transition: all 0.2s ease;
+}
