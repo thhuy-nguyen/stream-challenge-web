@@ -1,48 +1,87 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '../../context/AuthContext';
+import { createClient } from '../../../utils/supabase/client';
 
 export default function Register() {
   const router = useRouter();
-  const { register, socialLogin, isLoading, error } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [localError, setLocalError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const supabase = createClient();
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setLocalError(null);
+    setError(null);
 
     // Validate form
     if (password !== confirmPassword) {
-      setLocalError('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
 
     if (password.length < 8) {
-      setLocalError('Password must be at least 8 characters long');
+      setError('Password must be at least 8 characters long');
       return;
     }
     
+    setIsLoading(true);
+    
     try {
-      await register(email, password, displayName);
-      router.push('/dashboard');
-    } catch (err) {
+      // Sign up with Supabase
+      const { error: signUpError, data } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            display_name: displayName,
+          },
+        },
+      });
+      
+      if (signUpError) {
+        throw signUpError;
+      }
+      
+      // Check if email confirmation is required
+      if (data?.user?.identities?.length === 0) {
+        router.push('/auth/verification-sent');
+      } else {
+        router.push('/dashboard');
+      }
+      
+      router.refresh();
+    } catch (err: any) {
       console.error('Registration error:', err);
-      setLocalError('Registration failed. Please try again.');
+      setError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSocialLogin = async (provider: 'google' | 'twitch') => {
     try {
-      await socialLogin(provider);
-    } catch (err) {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      
+      if (error) {
+        throw error;
+      }
+    } catch (err: any) {
       console.error(`${provider} login error:`, err);
+      setError(err.message || `${provider} login failed. Please try again.`);
+      setIsLoading(false);
     }
   };
 
@@ -70,12 +109,12 @@ export default function Register() {
             </div>
 
             {/* Error Message */}
-            {(error || localError) && (
+            {error && (
               <div className="alert alert-error mb-6 bg-opacity-20 backdrop-blur-md border-red-500/40">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>{error || localError}</span>
+                <span>{error}</span>
               </div>
             )}
 

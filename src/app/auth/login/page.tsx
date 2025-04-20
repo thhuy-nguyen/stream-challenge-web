@@ -1,36 +1,64 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, FormEvent } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
-import { useAuth } from '../../context/AuthContext';
+import { createClient } from '../../../utils/supabase/client';
 
 export default function Login() {
   const router = useRouter();
-  const { login, socialLogin, isLoading, error } = useAuth();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [localError, setLocalError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const supabase = createClient();
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setLocalError(null);
+    setError(null);
+    setIsLoading(true);
     
     try {
-      await login(email, password);
-      router.push('/dashboard');
-    } catch (err) {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      router.push(callbackUrl);
+      router.refresh();
+    } catch (err: any) {
       console.error('Login error:', err);
-      setLocalError('Login failed. Please check your credentials and try again.');
+      setError(err.message || 'Login failed. Please check your credentials and try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSocialLogin = async (provider: 'google' | 'twitch') => {
     try {
-      await socialLogin(provider);
-    } catch (err) {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback?callbackUrl=${callbackUrl}`,
+        },
+      });
+      
+      if (error) {
+        throw error;
+      }
+    } catch (err: any) {
       console.error(`${provider} login error:`, err);
+      setError(err.message || `${provider} login failed. Please try again.`);
+      setIsLoading(false);
     }
   };
 
@@ -58,12 +86,12 @@ export default function Login() {
             </div>
 
             {/* Error Message */}
-            {(error || localError) && (
+            {error && (
               <div className="alert alert-error mb-6 bg-opacity-20 backdrop-blur-md border-red-500/40">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>{error || localError}</span>
+                <span>{error}</span>
               </div>
             )}
 
@@ -158,7 +186,7 @@ export default function Login() {
                   data-client-id={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
                 >
                   <svg className="h-5 w-5 text-red-400" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12.545 10.239v3.821h5.445c-0.712 2.315-2.647 3.972-5.445 3.972-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032c1.498 0 2.866 0.549 3.921 1.453l2.814-2.814c-1.79-1.677-4.184-2.702-6.735-2.702-5.514 0-10 4.486-10 10s4.486 10 10 10c8.311 0 10-7.721 10-11.144 0-0.763-0.068-1.349-0.21-1.934h-9.79z" />
+                    <path d="M12.545 10.239v3.821h5.445c-0.712 2.315-2.647 3.972-5.445 3.972-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032 1.498 0 2.866 0.549 3.921 1.453l2.814-2.814c-1.79-1.677-4.184-2.702-6.735-2.702-5.514 0-10 4.486-10 10s4.486 10 10 10c8.311 0 10-7.721 10-11.144 0-0.763-0.068-1.349-0.21-1.934h-9.79z" />
                   </svg>
                   <span className="ml-2">Google</span>
                 </button>
