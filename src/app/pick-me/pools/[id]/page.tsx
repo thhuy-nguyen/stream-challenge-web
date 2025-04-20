@@ -1,5 +1,6 @@
 'use client';
 
+import { createClient } from '@/utils/supabase/client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -59,28 +60,55 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
   const [error, setError] = useState('');
   const [isDrawing, setIsDrawing] = useState(false);
   const [copied, setCopied] = useState(false);
-  
+  const [isJoining, setIsJoining] = useState(false);
+  const [hasJoined, setHasJoined] = useState(false);
+
   // Use the toast hook
   const { showToast } = useToast();
-  
+
   // Calculate time remaining for an active pool
   const getTimeRemaining = () => {
     if (!pool || pool.status !== 'active') return null;
-    
+
     const endTime = new Date(pool.endTime).getTime();
     const now = new Date().getTime();
     const diff = endTime - now;
-    
+
     if (diff <= 0) return { minutes: 0, seconds: 0 };
-    
+
     const minutes = Math.floor(diff / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    
+
     return { minutes, seconds };
   };
-  
+
   const [timeRemaining, setTimeRemaining] = useState(getTimeRemaining());
-  
+
+  // Add this function to check if the user has already joined
+  const checkUserJoinStatus = async (participants: Participant[]) => {
+    try {
+      const supabase = createClient();
+      // Get the current user directly from Supabase
+      const { data: { user }, error } = await supabase.auth.getUser();
+      
+      if (error || !user) {
+        console.error('Error getting user or user not authenticated:', error);
+        return false;
+      }
+      const currentUserId = user.id;
+      
+      // Look for this user in the participants array
+      const isParticipant = participants.some(participant => 
+        participant.userId === currentUserId
+      );
+      setHasJoined(isParticipant);
+      return isParticipant;
+    } catch (error) {
+      console.error('Error checking join status:', error);
+      return false;
+    }
+  };
+
   // Fetch pool details
   useEffect(() => {
     const fetchPoolDetails = async () => {
@@ -100,6 +128,8 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
         if (data.pool.status === 'completed') {
           fetchWinners();
         }
+        // Check if the current user is already a participant
+        await checkUserJoinStatus(data.participants);
       } catch (err: any) {
         setError(err.message || 'An error occurred');
       } finally {
@@ -122,16 +152,16 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     
     return () => clearInterval(timer);
   }, [unwrappedParams.id]);
-  
+
   // Fetch winners
   const fetchWinners = async () => {
     try {
       const response = await fetch(`/api/pick-me/pools/${unwrappedParams.id}/draw`);
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch winners');
       }
-      
+
       const data = await response.json();
       setWinners({
         primaryWinners: data.primaryWinners || [],
@@ -141,33 +171,33 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
       console.error('Error fetching winners:', err);
     }
   };
-  
+
   // Handle manual draw winners
   const handleDrawWinners = async () => {
     if (!confirm('Are you sure you want to draw winners now? This action cannot be undone.')) {
       return;
     }
-    
+
     setIsDrawing(true);
-    
+
     try {
       const response = await fetch(`/api/pick-me/pools/${unwrappedParams.id}/draw`, {
         method: 'POST',
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to draw winners');
       }
-      
+
       const data = await response.json();
-      
+
       // Update the winners state
       setWinners({
         primaryWinners: data.primaryWinners || [],
         backupWinners: data.backupWinners || []
       });
-      
+
       // Update pool status
       setPool(prev => prev ? { ...prev, status: 'completed' } : null);
     } catch (err: any) {
@@ -176,45 +206,88 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
       setIsDrawing(false);
     }
   };
-  
-  // Helper function for showing toast notifications
-  const toast = ({ title, description, variant = "info" }) => {
-    const toastId = crypto.randomUUID();
-    const alertClass = `alert alert-${variant}`;
-    
-    let icon = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="h-6 w-6 shrink-0 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
-    
-    if (variant === "success") {
-      icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-    } else if (variant === "error") {
-      icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-    } else if (variant === "warning") {
-      icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>';
+
+  // Determine if the current user has already joined this pool
+  useEffect(() => {
+    if (participants.length > 0) {
+      setHasJoined(false); // Reset, will be updated by checkUserParticipation
+    }
+  }, [participants]);
+
+  // Function to check if the current user is a participant
+  const checkUserParticipation = async () => {
+    try {
+      const response = await fetch(`/api/user/me`);
+      if (!response.ok) {
+        return; // User not authenticated or other error
+      }
+
+      const userData = await response.json();
+      const userId = userData.id;
+
+      // Check if this user is already in the participants list
+      const isParticipant = participants.some(p => p.userId === userId);
+      setHasJoined(isParticipant);
+    } catch (error) {
+      console.error('Error checking user participation:', error);
+    }
+  };
+
+  // Function to handle joining the pool
+  const handleJoinPool = async () => {
+    if (hasJoined) {
+      showToast({
+        title: "Already Joined",
+        description: "You are already a participant in this pool.",
+        variant: "info"
+      });
+      return;
     }
     
-    document.body.insertAdjacentHTML(
-      'afterbegin',
-      `<div id="${toastId}" class="toast toast-top toast-end">
-        <div class="${alertClass}">
-          ${icon}
-          <div>
-            ${title ? `<h3 class="font-bold">${title}</h3>` : ''}
-            ${description ? `<div class="text-xs">${description}</div>` : ''}
-          </div>
-        </div>
-      </div>`
-    );
+    setIsJoining(true);
     
-    // Remove toast after 3 seconds
-    setTimeout(() => {
-      const toastElement = document.getElementById(toastId);
-      if (toastElement) {
-        toastElement.classList.add('opacity-0');
-        setTimeout(() => toastElement.remove(), 300);
+    try {
+      const response = await fetch(`/api/pick-me/pools/${unwrappedParams.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        if (data.alreadyJoined) {
+          setHasJoined(true);
+          showToast({
+            title: "Already Joined",
+            description: "You are already a participant in this pool.",
+            variant: "info"
+          });
+        } else {
+          throw new Error(data.message || 'Failed to join the pool');
+        }
+      } else {
+        // Update the participants list with the new participant
+        setParticipants(prev => [...prev, data.participant]);
+        setHasJoined(true);
+        showToast({
+          title: "Successfully Joined!",
+          description: "You have been added to the pool. Good luck!",
+          variant: "success"
+        });
       }
-    }, 3000);
+    } catch (err: any) {
+      showToast({
+        title: "Error",
+        description: err.message || 'An error occurred while joining the pool',
+        variant: "error"
+      });
+    } finally {
+      setIsJoining(false);
+    }
   };
-  
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 flex items-center justify-center">
@@ -225,7 +298,7 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
       </div>
     );
   }
-  
+
   if (error || !pool) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 py-12">
@@ -246,7 +319,7 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 py-12">
       <div className="container mx-auto px-6">
@@ -276,6 +349,38 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-white">{pool.title}</h2>
                 <p className="text-white/70 mt-2">{pool.description}</p>
+                
+                {/* Join button for non-creators */}
+                {pool.status === 'active' && !pool.isCreator && (
+                  <div className="mt-4">
+                    <button 
+                      className={`btn ${hasJoined ? 'btn-success' : 'btn-primary'} gap-2`}
+                      onClick={handleJoinPool}
+                      disabled={isJoining || hasJoined}
+                    >
+                      {isJoining ? (
+                        <>
+                          <span className="loading loading-spinner loading-xs"></span>
+                          Joining...
+                        </>
+                      ) : hasJoined ? (
+                        <>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          Joined
+                        </>
+                      ) : (
+                        <>
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
+                          </svg>
+                          Join Pool
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
                 
                 <div className="mt-6 grid grid-cols-2 gap-4">
                   <div>

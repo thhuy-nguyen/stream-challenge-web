@@ -26,9 +26,7 @@ export default async function Dashboard() {
       description, 
       status, 
       end_time,
-      created_at,
-      is_private,
-      access_id
+      created_at
     `)
     .eq('creator_id', user.id)
     .order('created_at', { ascending: false });
@@ -439,7 +437,7 @@ export default async function Dashboard() {
                         <td>
                           <div className="flex gap-2">
                             <Link 
-                              href={`/pick-me/pools/${pool.is_private && pool.access_id ? pool.access_id : pool.id}`}
+                              href={`/pick-me/pools/${pool.id}`}
                               className="btn btn-xs btn-primary"
                             >
                               View

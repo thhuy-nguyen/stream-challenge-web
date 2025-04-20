@@ -5,7 +5,7 @@ import { createClient } from '@/utils/supabase/server';
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = await createClient();
-    const poolId = params.id;
+    const {id: poolId } = await params;
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const supabase = await createClient();
-    const poolId = params.id;
+    const {id: poolId } = await params;
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
