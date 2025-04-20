@@ -3,7 +3,7 @@
 import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '../../../utils/supabase/client';
+import { createClient } from '@/utils/supabase/client';
 
 export default function UpdatePassword() {
   const router = useRouter();

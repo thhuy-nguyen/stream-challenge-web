@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '../../../utils/supabase/client';
+import { createClient } from '@/utils/supabase/client';
 
 export default function Register() {
   const router = useRouter();

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '../../utils/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -28,56 +28,77 @@ export default async function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900">
-      {/* Header with glassmorphism */}
-      <header className="bg-white/5 backdrop-blur-xl border-b border-white/10 sticky top-0 z-10">
+      {/* Enhanced Header with glassmorphism */}
+      <header className="bg-gradient-to-r from-indigo-900/80 via-purple-900/80 to-indigo-800/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-10 shadow-lg">
         <div className="container mx-auto px-6 py-3">
           <div className="navbar p-0">
             <div className="navbar-start">
+              <div className="dropdown lg:hidden">
+                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle text-white">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h7" />
+                  </svg>
+                </div>
+                <ul tabIndex={0} className="menu dropdown-content mt-3 z-[1] p-2 shadow-lg bg-gradient-to-br from-indigo-900 to-purple-900 rounded-box w-52">
+                  <li><Link href="/dashboard" className="text-white font-medium">Dashboard</Link></li>
+                  <li><Link href="/profile" className="text-white/90">Profile</Link></li>
+                  <li><Link href="/settings" className="text-white/90">Settings</Link></li>
+                  <li><Link href="/help" className="text-white/90">Help</Link></li>
+                </ul>
+              </div>
+              
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
+                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 rotate-3 hover:rotate-0 transition-all duration-300">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-white">
                     <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="ml-2 text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">Stream Challenge</span>
+                <div className="ml-2 flex flex-col">
+                  <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">Stream Challenge</span>
+                  <span className="text-xs text-white/60 -mt-1">Engage Your Audience</span>
+                </div>
               </div>
               
-              <div className="hidden md:flex ml-8">
-                <ul className="menu menu-horizontal space-x-2 px-1 bg-transparent">
-                  <li>
-                    <Link href="/dashboard" className="text-white font-medium border-b-2 border-purple-500">Dashboard</Link>
-                  </li>
-                  <li>
-                    <Link href="/profile" className="text-white/70 hover:text-white border-b-2 border-transparent hover:border-purple-500/50">Profile</Link>
-                  </li>
-                  <li>
-                    <Link href="/settings" className="text-white/70 hover:text-white border-b-2 border-transparent hover:border-purple-500/50">Settings</Link>
-                  </li>
-                  <li>
-                    <Link href="/help" className="text-white/70 hover:text-white border-b-2 border-transparent hover:border-purple-500/50">Help</Link>
-                  </li>
-                </ul>
+              <div className="hidden lg:flex ml-10">
+                <div className="tabs tabs-boxed bg-white/5 p-1 rounded-xl">
+                  <Link href="/dashboard" className="tab tab-md text-white font-medium tab-active bg-white/10">Dashboard</Link>
+                  <Link href="/profile" className="tab tab-md text-white/70 hover:text-white">Profile</Link>
+                  <Link href="/settings" className="tab tab-md text-white/70 hover:text-white">Settings</Link>
+                  <Link href="/help" className="tab tab-md text-white/70 hover:text-white">Help</Link>
+                </div>
               </div>
             </div>
             
             <div className="navbar-end">
-              <div className="hidden sm:flex items-center mr-3">
-                <div className="avatar online">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold">
-                    {displayName?.charAt(0).toUpperCase()}
+              <div className="dropdown dropdown-end">
+                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar online">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 ring ring-purple-500/30 ring-offset-base-100 ring-offset-1 flex items-center justify-center text-white font-bold">
+                    <span className="inline-flex items-center justify-center w-full h-full">
+                      {displayName?.charAt(0).toUpperCase()}
+                    </span>
                   </div>
                 </div>
-                <span className="ml-2 text-white/80 font-medium">{displayName}</span>
+                <ul tabIndex={0} className="menu dropdown-content mt-3 z-[1] p-2 shadow-lg bg-gradient-to-br from-indigo-900 to-purple-900 rounded-box w-52">
+                  <li className="mb-2 disabled">
+                    <a className="text-white font-medium">
+                      <div className="flex flex-col items-start">
+                        <span>{displayName}</span>
+                        <span className="text-xs text-green-400">Online</span>
+                      </div>
+                    </a>
+                  </li>
+                  <div className="divider my-0 h-px bg-white/10"></div>
+                  <li><a className="text-white/90">My Profile</a></li>
+                  <li><a className="text-white/90">Account Settings</a></li>
+                  <li>
+                    <form action={logout}>
+                      <button type="submit" className="text-red-400 w-full text-left">
+                        Logout
+                      </button>
+                    </form>
+                  </li>
+                </ul>
               </div>
-              
-              <form action={logout}>
-                <button 
-                  type="submit"
-                  className="btn btn-error btn-sm text-white"
-                >
-                  Logout
-                </button>
-              </form>
             </div>
           </div>
         </div>
@@ -198,9 +219,9 @@ export default async function Dashboard() {
               <h3 className="card-title text-white group-hover:text-blue-300 transition-colors">Start Pick Me</h3>
               <p className="text-white/70 text-sm">Create a selection pool for your audience and randomly pick participants for your stream</p>
               <div className="card-actions justify-start mt-4">
-                <button className="btn btn-info btn-sm text-white">
+                <Link href="/pick-me/create" className="btn btn-info btn-sm text-white">
                   Create Pool
-                </button>
+                </Link>
                 <button className="btn btn-ghost btn-sm btn-circle">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -333,14 +354,18 @@ export default async function Dashboard() {
               </div>
             </div>
             
-            <div className="card-actions justify-center mt-4">
-              <button className="btn btn-ghost btn-sm normal-case text-white/50 hover:text-white/80">
-                Show more activities
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-            </div>
+            {/* Only show the "Show more" button if there are more than 3 activities */}
+            {/* For now, this is just a placeholder - in a real app, you would use a variable like totalActivities > 3 */}
+            {true && (
+              <div className="card-actions justify-center mt-4">
+                <button className="btn btn-ghost btn-sm normal-case text-white/50 hover:text-white/80">
+                  Show more activities
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
         </div>
         
