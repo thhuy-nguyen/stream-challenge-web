@@ -17,6 +17,22 @@ export default async function Dashboard() {
   // Get user metadata
   const displayName = user.user_metadata?.display_name || user.email?.split('@')[0];
 
+  // Fetch the user's Pick Me pools
+  const { data: pools, error: poolsError } = await supabase
+    .from('pick_me_pools')
+    .select(`
+      id, 
+      title, 
+      description, 
+      status, 
+      end_time,
+      created_at,
+      is_private,
+      access_id
+    `)
+    .eq('creator_id', user.id)
+    .order('created_at', { ascending: false });
+  
   // Function to handle logout (this will be a server action)
   async function logout() {
     'use server';
@@ -364,6 +380,93 @@ export default async function Dashboard() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* My Pools Section */}
+        <div className="card mt-12 bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl">
+          <div className="card-body">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="card-title text-white/90 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z" />
+                </svg>
+                My Pick Me Pools
+              </h3>
+              <Link href="/pick-me/create" className="btn btn-primary btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                </svg>
+                Create New
+              </Link>
+            </div>
+            
+            {poolsError ? (
+              <div className="alert alert-error">
+                <p>Failed to load pools. Please try again later.</p>
+              </div>
+            ) : pools && pools.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="table w-full bg-transparent">
+                  <thead>
+                    <tr className="text-indigo-300 border-indigo-800/50">
+                      <th>Name</th>
+                      <th>Status</th>
+                      <th>End Date</th>
+                      <th>Created</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pools.map((pool) => (
+                      <tr key={pool.id} className="text-white hover:bg-white/5 border-indigo-800/30">
+                        <td className="font-medium">{pool.title}</td>
+                        <td>
+                          {pool.status === 'active' && (
+                            <span className="badge badge-success">Active</span>
+                          )}
+                          {pool.status === 'completed' && (
+                            <span className="badge badge-info">Completed</span>
+                          )}
+                          {pool.status === 'cancelled' && (
+                            <span className="badge badge-error">Cancelled</span>
+                          )}
+                        </td>
+                        <td>{new Date(pool.end_time).toLocaleDateString()}</td>
+                        <td>{new Date(pool.created_at).toLocaleDateString()}</td>
+                        <td>
+                          <div className="flex gap-2">
+                            <Link 
+                              href={`/pick-me/pools/${pool.is_private && pool.access_id ? pool.access_id : pool.id}`}
+                              className="btn btn-xs btn-primary"
+                            >
+                              View
+                            </Link>
+                            {pool.status === 'active' && (
+                              <button className="btn btn-xs btn-ghost">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-indigo-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <p className="mt-4 text-white/70">You haven't created any pools yet.</p>
+                <Link href="/pick-me/create" className="btn btn-primary mt-4">
+                  Create Your First Pool
+                </Link>
               </div>
             )}
           </div>

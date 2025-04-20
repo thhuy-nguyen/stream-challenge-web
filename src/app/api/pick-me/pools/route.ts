@@ -30,7 +30,6 @@ export async function POST(request: NextRequest) {
       notificationEnabled,
       autoPublishResults,
       requireVerification,
-      privatePool,
       prizes,
     } = requestData;
     
@@ -40,9 +39,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-    
-    // Generate a secure access ID if privatePool is enabled
-    const accessId = privatePool ? crypto.randomUUID() : null;
     
     // Create the pool in the database
     const { data: pool, error: insertError } = await supabase
@@ -60,8 +56,6 @@ export async function POST(request: NextRequest) {
         auto_publish_results: autoPublishResults,
         require_verification: requireVerification,
         status: 'active', // Initial status
-        access_id: accessId,
-        is_private: privatePool,
       })
       .select()
       .single();
@@ -99,16 +93,11 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // Set up a scheduled job to automatically draw winners when the entry period ends
-    // In a production environment, you would use a task queue or CRON job
-    // For this demo, we'll just return the pool data
-    
     return NextResponse.json(
       { 
-        id: pool.id, 
-        accessId: accessId,
+        id: pool.id,
         message: 'Pool created successfully',
-        accessUrl: accessId ? `/pick-me/pools/${accessId}` : `/pick-me/pools/${pool.id}`
+        accessUrl: `/pick-me/pools/${pool.id}`
       }, 
       { status: 201 }
     );

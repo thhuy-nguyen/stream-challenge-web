@@ -38,7 +38,6 @@ export default function CreatePickMePage() {
     notificationEnabled: true,
     autoPublishResults: true,
     requireVerification: false,
-    privatePool: true, // Default to private access via UUID
   });
   
   const [isProcessing, setIsProcessing] = useState(false);
@@ -119,7 +118,6 @@ export default function CreatePickMePage() {
           notificationEnabled: formData.notificationEnabled,
           autoPublishResults: formData.autoPublishResults,
           requireVerification: formData.requireVerification,
-          privatePool: formData.privatePool,
           prizes: validPrizes,
         }),
       });

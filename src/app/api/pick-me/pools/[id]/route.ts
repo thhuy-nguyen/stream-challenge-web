@@ -17,15 +17,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     
     let poolQuery = supabase.from('pick_me_pools').select('*');
     
-    // Try to find the pool by either ID or access_id
-    // First, check if the provided ID is a UUID (access_id)
-    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (uuidPattern.test(idOrAccessId)) {
-      poolQuery = poolQuery.or(`id.eq.${idOrAccessId},access_id.eq.${idOrAccessId}`);
-    } else {
-      // Regular ID
-      poolQuery = poolQuery.eq('id', idOrAccessId);
-    }
+    // Find the pool by ID
+    poolQuery = poolQuery.eq('id', idOrAccessId);
     
     const { data: pool, error: poolError } = await poolQuery.single();
     
@@ -33,14 +26,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json(
         { message: 'Pool not found' }, 
         { status: 404 }
-      );
-    }
-    
-    // If the pool is private and the user is not the creator, check access
-    if (pool.is_private && pool.creator_id !== user.id && pool.access_id !== idOrAccessId) {
-      return NextResponse.json(
-        { message: 'Unauthorized access to this pool' }, 
-        { status: 403 }
       );
     }
     
@@ -87,8 +72,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       createdAt: pool.created_at,
       completedAt: pool.completed_at,
       participantCount: participants ? participants.length : 0,
-      isPrivate: pool.is_private,
-      accessId: pool.access_id,
       isCreator: pool.creator_id === user.id,
     };
     

@@ -22,5 +22,4 @@ export interface PickMeFormData {
   notificationEnabled: boolean;
   autoPublishResults: boolean;
   requireVerification: boolean;
-  privatePool: boolean;
 }

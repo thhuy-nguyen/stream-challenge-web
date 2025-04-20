@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, ReactNode } from 'react';
+import { useEffect, ReactNode, useState, createContext, useContext } from 'react';
 import { createPortal } from 'react-dom';
 
 // Toast variants
@@ -108,13 +108,23 @@ const ToastContainer = ({
 };
 
 // Toast context to manage toasts
-import { createContext, useState, useContext, ReactNode } from 'react';
-
 interface ToastContextValue {
   showToast: (options: ToastOptions) => void;
 }
 
 const ToastContext = createContext<ToastContextValue | undefined>(undefined);
+
+// Client-side only component for the toast container
+const ClientOnlyPortal = ({ children }: { children: ReactNode }) => {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  return mounted ? createPortal(children, document.body) : null;
+};
 
 // Toast provider component
 export const ToastProvider = ({ children }: { children: ReactNode }) => {
@@ -132,16 +142,16 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
-      {typeof window !== 'undefined' &&
-        createPortal(
+      <ClientOnlyPortal>
+        {toasts.length > 0 && (
           <ToastContainer 
             toasts={toasts} 
             position={toasts[0]?.position || 'top'} 
             alignment={toasts[0]?.alignment || 'end'} 
             onClose={removeToast} 
-          />,
-          document.body
+          />
         )}
+      </ClientOnlyPortal>
     </ToastContext.Provider>
   );
 };

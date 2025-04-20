@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useToast } from '@/utils/hooks/useToast';
+import React from 'react';
 
 interface Participant {
   id: string;
@@ -40,12 +41,12 @@ interface PoolDetail {
   createdAt: string;
   completedAt: string | null;
   participantCount: number;
-  isPrivate: boolean;
-  accessId: string | null;
   isCreator: boolean;
 }
 
 export default function PoolDetailPage({ params }: { params: { id: string } }) {
+  // Unwrap params with React.use() to prepare for future Next.js versions
+  const unwrappedParams = React.use(params);
   const router = useRouter();
   const [pool, setPool] = useState<PoolDetail | null>(null);
   const [winners, setWinners] = useState<{
@@ -57,7 +58,6 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [isDrawing, setIsDrawing] = useState(false);
-  const [shareLink, setShareLink] = useState('');
   const [copied, setCopied] = useState(false);
   
   // Use the toast hook
@@ -85,7 +85,7 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchPoolDetails = async () => {
       try {
-        const response = await fetch(`/api/pick-me/pools/${params.id}`);
+        const response = await fetch(`/api/pick-me/pools/${unwrappedParams.id}`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch pool details');
@@ -95,12 +95,6 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
         setPool(data.pool);
         setParticipants(data.participants || []);
         setPrizes(data.prizes || []);
-        
-        // Generate share link for creators
-        if (data.pool.isCreator && data.pool.isPrivate && data.pool.accessId) {
-          const host = window.location.origin;
-          setShareLink(`${host}/pick-me/pools/${data.pool.accessId}`);
-        }
         
         // If pool is completed, fetch winners
         if (data.pool.status === 'completed') {
@@ -127,12 +121,12 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     }, 1000);
     
     return () => clearInterval(timer);
-  }, [params.id]);
+  }, [unwrappedParams.id]);
   
   // Fetch winners
   const fetchWinners = async () => {
     try {
-      const response = await fetch(`/api/pick-me/pools/${params.id}/draw`);
+      const response = await fetch(`/api/pick-me/pools/${unwrappedParams.id}/draw`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch winners');
@@ -157,7 +151,7 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     setIsDrawing(true);
     
     try {
-      const response = await fetch(`/api/pick-me/pools/${params.id}/draw`, {
+      const response = await fetch(`/api/pick-me/pools/${unwrappedParams.id}/draw`, {
         method: 'POST',
       });
       
@@ -181,23 +175,6 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     } finally {
       setIsDrawing(false);
     }
-  };
-  
-  // Copy share link to clipboard
-  const copyShareLink = () => {
-    navigator.clipboard.writeText(shareLink);
-    setCopied(true);
-    
-    // Use our newly created toast hook
-    showToast({
-      message: "Link copied to clipboard!",
-      variant: "success",
-      position: "top",
-      alignment: "end"
-    });
-    
-    // Reset copied state after a short delay
-    setTimeout(() => setCopied(false), 2000);
   };
   
   // Helper function for showing toast notifications
@@ -338,30 +315,6 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
                     </div>
                   )}
                 </div>
-                
-                {/* Share Link (for creators of private pools) */}
-                {pool.isCreator && pool.isPrivate && shareLink && (
-                  <div className="mt-6 p-4 bg-blue-900/20 rounded-lg border border-blue-500/30">
-                    <h3 className="text-sm font-medium text-blue-400 mb-2">Share Link</h3>
-                    <div className="flex items-center space-x-2">
-                      <input 
-                        type="text" 
-                        className="input input-bordered input-sm bg-blue-900/30 text-white flex-1" 
-                        value={shareLink} 
-                        readOnly 
-                      />
-                      <button 
-                        className="btn btn-sm btn-primary" 
-                        onClick={copyShareLink}
-                      >
-                        {copied ? 'Copied!' : 'Copy'}
-                      </button>
-                    </div>
-                    <p className="text-white/60 text-xs mt-2">
-                      Share this secure link with your audience. Only people with this link can access the pool.
-                    </p>
-                  </div>
-                )}
               </div>
               
               {/* Timer or Status Display */}
