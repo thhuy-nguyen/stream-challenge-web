@@ -4,86 +4,79 @@ import { useState, FormEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
+import { useTranslations } from 'next-intl';
 
 export default function UpdatePassword() {
+  const t = useTranslations('auth.updatePassword');
   const router = useRouter();
+  
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState<{
-    type: 'success' | 'error' | null;
-    text: string | null;
-  }>({ type: null, text: null });
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isSessionValid, setIsSessionValid] = useState(false);
 
   const supabase = createClient();
-  
-  // Check if we have a session (user coming from reset email)
+
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
+      const { data } = await supabase.auth.getSession();
       
-      if (error || !session) {
-        setMessage({
-          type: 'error',
-          text: 'Invalid or expired reset link. Please request a new one.'
-        });
+      if (!data.session) {
+        router.push('/auth/login?message=password-reset-link-expired');
+      } else {
+        setIsSessionValid(true);
       }
     };
-    
+
     checkSession();
-  }, [supabase]);
-  
+  }, [router, supabase]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setMessage({ type: null, text: null });
     
     if (password !== confirmPassword) {
-      setMessage({
-        type: 'error',
-        text: 'Passwords do not match'
-      });
+      setError(t('passwordsDoNotMatch'));
       return;
     }
     
-    if (password.length < 8) {
-      setMessage({
-        type: 'error',
-        text: 'Password must be at least 8 characters long'
-      });
-      return;
-    }
-    
+    setError(null);
+    setMessage(null);
     setIsLoading(true);
     
     try {
-      // Update the user's password
       const { error } = await supabase.auth.updateUser({
-        password
+        password,
       });
       
       if (error) {
         throw error;
       }
       
-      setMessage({
-        type: 'success',
-        text: 'Password updated successfully! Redirecting to login...'
-      });
+      setMessage(t('passwordUpdated'));
       
-      // Redirect to login after a short delay
+      // Redirect to dashboard after 2 seconds
       setTimeout(() => {
-        router.push('/auth/login');
+        router.push('/dashboard');
       }, 2000);
-    } catch (err: any) {
-      console.error('Password update error:', err);
-      setMessage({
-        type: 'error',
-        text: err.message || 'Failed to update password. Please try again.'
-      });
+    } catch (err: Error | unknown) {
+      console.error('Update password error:', err);
+      setError(err instanceof Error ? err.message : t('error'));
     } finally {
       setIsLoading(false);
     }
   };
+
+  if (!isSessionValid) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-800 to-violet-900 flex items-center justify-center">
+        <div className="p-8 text-center">
+          <div className="loading loading-spinner loading-lg text-primary"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-800 to-violet-900 flex items-center justify-center p-4">
@@ -101,32 +94,38 @@ export default function UpdatePassword() {
             <div className="flex flex-col items-center mb-6">
               <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-white">
-                  <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" clipRule="evenodd" />
+                  <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5zm-10.5 7.5h15v-6.75a1.5 1.5 0 00-1.5-1.5h-12a1.5 1.5 0 00-1.5 1.5v6.75z" clipRule="evenodd" />
                 </svg>
               </div>
-              <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200">Update Password</h1>
-              <p className="text-white/80 mt-2">Create a new password for your account</p>
+              <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200">{t('title')}</h1>
+              <p className="text-white/80 mt-2">{t('subtitle')}</p>
             </div>
 
-            {/* Message */}
-            {message.text && (
-              <div className={`alert ${message.type === 'success' ? 'alert-success' : 'alert-error'} mb-6 bg-opacity-20 backdrop-blur-md`}>
+            {/* Success Message */}
+            {message && (
+              <div className="alert alert-success mb-6 bg-opacity-20 backdrop-blur-md border-green-500/40">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
-                  {message.type === 'success' ? (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  ) : (
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  )}
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>{message.text}</span>
+                <span>{message}</span>
               </div>
             )}
 
-            {/* New Password Form */}
+            {/* Error Message */}
+            {error && (
+              <div className="alert alert-error mb-6 bg-opacity-20 backdrop-blur-md border-red-500/40">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* Update Password Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="form-control w-full">
                 <label className="label">
-                  <span className="label-text text-white/80">New Password</span>
+                  <span className="label-text text-white/80">{t('newPasswordLabel')}</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -138,17 +137,18 @@ export default function UpdatePassword() {
                     id="password"
                     type="password"
                     required
+                    minLength={8}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="input input-bordered w-full pl-10 bg-white/5 border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent placeholder-white/50"
-                    placeholder="New password (8+ characters)"
+                    placeholder={t('newPasswordPlaceholder')}
                   />
                 </div>
               </div>
 
               <div className="form-control w-full">
                 <label className="label">
-                  <span className="label-text text-white/80">Confirm New Password</span>
+                  <span className="label-text text-white/80">{t('confirmPasswordLabel')}</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -160,36 +160,36 @@ export default function UpdatePassword() {
                     id="confirmPassword"
                     type="password"
                     required
+                    minLength={8}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     className="input input-bordered w-full pl-10 bg-white/5 border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent placeholder-white/50"
-                    placeholder="Confirm new password"
+                    placeholder={t('confirmPasswordPlaceholder')}
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                disabled={isLoading || message?.type === 'error'}
+                disabled={isLoading}
                 className="btn btn-primary w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 border-none shadow-lg hover:shadow-purple-500/30 transition-all duration-300"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <span className="loading loading-spinner loading-sm mr-2"></span>
-                    Updating Password...
+                    {t('updating')}
                   </div>
-                ) : 'Update Password'}
+                ) : t('updatePassword')}
               </button>
+              
+              <div className="text-center mt-4">
+                <p className="text-white/70 text-sm">
+                  <Link href="/auth/login" className="text-purple-300 hover:text-white transition-colors">
+                    {t('backToLogin')}
+                  </Link>
+                </p>
+              </div>
             </form>
-          </div>
-          
-          {/* Footer */}
-          <div className="py-4 px-8 bg-black/20 text-center">
-            <p className="text-sm text-white/80">
-              <Link href="/auth/login" className="text-purple-300 hover:text-white font-medium transition-colors">
-                Back to Login
-              </Link>
-            </p>
           </div>
         </div>
       </div>

@@ -1,20 +1,22 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from 'next-intl';
 
 export default function Register() {
   const t = useTranslations('auth.register');
-  const commonT = useTranslations('common');
+  // Removed unused commonT variable
   
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,29 +25,18 @@ export default function Register() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    // Validate form
-    if (password !== confirmPassword) {
-      setError(t('errors.passwordMismatch'));
-      return;
-    }
-
-    if (password.length < 8) {
-      setError(t('errors.passwordTooShort'));
-      return;
-    }
-    
     setIsLoading(true);
     
     try {
-      // Sign up with Supabase
+      // Register new user
       const { error: signUpError, data } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            display_name: displayName,
+            username,
           },
+          emailRedirectTo: `${window.location.origin}/auth/callback?callbackUrl=${callbackUrl}`,
         },
       });
       
@@ -55,36 +46,50 @@ export default function Register() {
       
       // Check if email confirmation is required
       if (data?.user?.identities?.length === 0) {
-        router.push('/auth/verification-sent');
+        router.push('/auth/login?message=check-email');
       } else {
-        router.push('/dashboard');
+        // Create user profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            { 
+              id: data.user?.id,
+              username,
+              email,
+            },
+          ]);
+        
+        if (profileError) {
+          throw profileError;
+        }
+        
+        router.push(callbackUrl);
+        router.refresh();
       }
-      
-      router.refresh();
-    } catch (err: any) {
+    } catch (err: Error | unknown) {
       console.error('Registration error:', err);
-      setError(err.message || t('errors.emailInUse'));
+      setError(err instanceof Error ? err.message : t('error'));
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'twitch') => {
+  const handleSocialSignUp = async (provider: 'google' | 'twitch') => {
     try {
       setIsLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?callbackUrl=${callbackUrl}`,
         },
       });
       
       if (error) {
         throw error;
       }
-    } catch (err: any) {
-      console.error(`${provider} login error:`, err);
-      setError(err.message || `${provider} login failed. Please try again.`);
+    } catch (err: Error | unknown) {
+      console.error(`${provider} signup error:`, err);
+      setError(err instanceof Error ? err.message : `${provider} signup failed. Please try again.`);
       setIsLoading(false);
     }
   };
@@ -149,7 +154,7 @@ export default function Register() {
 
               <div className="form-control w-full">
                 <label className="label">
-                  <span className="label-text text-white/80">{t('displayNameLabel')}</span>
+                  <span className="label-text text-white/80">{t('usernameLabel')}</span>
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -158,13 +163,13 @@ export default function Register() {
                     </svg>
                   </div>
                   <input
-                    id="displayName"
+                    id="username"
                     type="text"
                     required
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="input input-bordered w-full pl-10 bg-white/5 border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent placeholder-white/50"
-                    placeholder={t('displayNamePlaceholder')}
+                    placeholder={t('usernamePlaceholder')}
                   />
                 </div>
               </div>
@@ -191,28 +196,6 @@ export default function Register() {
                 </div>
               </div>
 
-              <div className="form-control w-full">
-                <label className="label">
-                  <span className="label-text text-white/80">{t('confirmPasswordLabel')}</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-300" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <input
-                    id="confirmPassword"
-                    type="password"
-                    required
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="input input-bordered w-full pl-10 bg-white/5 border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent placeholder-white/50"
-                    placeholder={t('confirmPasswordPlaceholder')}
-                  />
-                </div>
-              </div>
-
               <button
                 type="submit"
                 disabled={isLoading}
@@ -233,7 +216,7 @@ export default function Register() {
 
               <div className="mt-6 grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => handleSocialLogin('google')}
+                  onClick={() => handleSocialSignUp('google')}
                   className="btn btn-outline btn-ghost bg-white/5 hover:bg-white/10 border-white/10 text-white"
                   data-client-id={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
                 >
@@ -244,7 +227,7 @@ export default function Register() {
                 </button>
 
                 <button
-                  onClick={() => handleSocialLogin('twitch')}
+                  onClick={() => handleSocialSignUp('twitch')}
                   className="btn btn-outline btn-ghost bg-white/5 hover:bg-white/10 border-white/10 text-white"
                 >
                   <svg className="h-5 w-5 text-purple-400" viewBox="0 0 24 24" fill="currentColor">

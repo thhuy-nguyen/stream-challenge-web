@@ -8,7 +8,6 @@ import { useTranslations } from 'next-intl';
 
 export default function Login() {
   const t = useTranslations('auth.login');
-  const commonT = useTranslations('common');
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -38,9 +37,9 @@ export default function Login() {
       
       router.push(callbackUrl);
       router.refresh();
-    } catch (err: any) {
+    } catch (err: Error | unknown) {
       console.error('Login error:', err);
-      setError(err.message || t('error'));
+      setError(err instanceof Error ? err.message : t('error'));
     } finally {
       setIsLoading(false);
     }
@@ -59,9 +58,9 @@ export default function Login() {
       if (error) {
         throw error;
       }
-    } catch (err: any) {
+    } catch (err: Error | unknown) {
       console.error(`${provider} login error:`, err);
-      setError(err.message || `${provider} login failed. Please try again.`);
+      setError(err instanceof Error ? err.message : `${provider} login failed. Please try again.`);
       setIsLoading(false);
     }
   };

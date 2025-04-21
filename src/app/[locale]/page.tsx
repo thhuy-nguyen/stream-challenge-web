@@ -1,17 +1,34 @@
 'use client';
 
 import Image from "next/image";
-import Link from "next/link";  // Changed from next-intl to next/link
-import { useState } from "react";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/utils/hooks/useAuth';
 import AppLayout from '@/app/components/AppLayout';
 
 export default function Home() {
-  const [showVideo, setShowVideo] = useState(false);
-  
-  // Get translations for different sections
   const t = useTranslations('home');
   const commonT = useTranslations('common');
+  const router = useRouter();
+  const { user, isLoading } = useAuth();
+
+  // Auto-redirect authenticated users
+  useEffect(() => {
+    if (!isLoading && user) {
+      router.push('/dashboard');
+    }
+  }, [isLoading, router, user]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg text-white"></div>
+      </div>
+    );
+  }
+
+  const [showVideo, setShowVideo] = useState(false);
 
   return (
     <AppLayout>
