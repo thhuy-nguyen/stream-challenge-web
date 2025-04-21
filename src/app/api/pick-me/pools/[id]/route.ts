@@ -1,10 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const {id: idOrAccessId } = await params;
+    
+    // Extract pool ID from the URL path
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const poolIdIndex = pathParts.findIndex(part => part === 'pools') + 1;
+    const idOrAccessId = pathParts[poolIdIndex];
+    
+    if (!idOrAccessId) {
+      return NextResponse.json(
+        { message: 'Pool ID not found in URL' }, 
+        { status: 400 }
+      );
+    }
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -106,10 +118,22 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // API endpoint to join a pool
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const {id: poolId } = await params;
+    
+    // Extract pool ID from the URL path
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const poolIdIndex = pathParts.findIndex(part => part === 'pools') + 1;
+    const poolId = pathParts[poolIdIndex];
+    
+    if (!poolId) {
+      return NextResponse.json(
+        { message: 'Pool ID not found in URL' }, 
+        { status: 400 }
+      );
+    }
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -165,7 +189,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
         );
       }
       
-      if (count >= pool.max_participants) {
+      if (count && count >= pool.max_participants) {
         return NextResponse.json(
           { message: 'This pool has reached the maximum number of participants' }, 
           { status: 400 }

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from 'next-intl';
+import { GoogleIcon } from '@/app/components/icons';
 
 export default function Register() {
   const t = useTranslations('auth.register');
@@ -220,9 +221,7 @@ export default function Register() {
                   className="btn btn-outline btn-ghost bg-white/5 hover:bg-white/10 border-white/10 text-white"
                   data-client-id={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
                 >
-                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12.545 10.239v3.821h5.445c-0.712 2.315-2.647 3.972-5.445 3.972-3.332 0-6.033-2.701-6.033-6.032s2.701-6.032 6.033-6.032c1.498 0 2.866 0.549 3.921 1.453l2.814-2.814c-1.79-1.677-4.184-2.702-6.735-2.702-5.514 0-10 4.486-10 10s4.486 10 10 10c8.311 0 10-7.721 10-11.144 0-0.763-0.068-1.349-0.21-1.934h-9.79z" />
-                  </svg>
+                  <GoogleIcon />
                   <span className="ml-2">Google</span>
                 </button>
 

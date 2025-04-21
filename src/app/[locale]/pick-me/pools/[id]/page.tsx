@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useToast } from '@/utils/hooks/useToast';
 import React from 'react';
 import Image from 'next/image';
+import { useParams } from 'next/navigation';
 
 interface Participant {
   id: string;
@@ -45,9 +46,10 @@ interface PoolDetail {
   isCreator: boolean;
 }
 
-export default function PoolDetailPage({ params }: { params: { id: string } }) {
-  // Unwrap params with React.use() to prepare for future Next.js versions
-  const unwrappedParams = React.use(params);
+export default function PoolDetailPage() {
+  const params = useParams();
+  const poolId = params.id as string;
+
   const [pool, setPool] = useState<PoolDetail | null>(null);
   const [winners, setWinners] = useState<{
     primaryWinners: Winner[];
@@ -62,10 +64,8 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
   const [isJoining, setIsJoining] = useState(false);
   const [hasJoined, setHasJoined] = useState(false);
 
-  // Use the toast hook
   const { showToast } = useToast();
 
-  // Calculate time remaining for an active pool
   const getTimeRemaining = useCallback(() => {
     if (!pool || pool.status !== 'active') return null;
 
@@ -83,11 +83,9 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
 
   const [timeRemaining, setTimeRemaining] = useState(getTimeRemaining());
 
-  // Add this function to check if the user has already joined
   const checkUserJoinStatus = async (participants: Participant[]) => {
     try {
       const supabase = createClient();
-      // Get the current user directly from Supabase
       const { data: { user }, error } = await supabase.auth.getUser();
       
       if (error || !user) {
@@ -96,7 +94,6 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
       }
       const currentUserId = user.id;
       
-      // Look for this user in the participants array
       const isParticipant = participants.some(participant => 
         participant.userId === currentUserId
       );
@@ -108,7 +105,6 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     }
   };
 
-  // Add a function to handle copying the share URL
   const handleCopyShareUrl = () => {
     const shareUrl = window.location.href;
     navigator.clipboard.writeText(shareUrl).then(
@@ -116,11 +112,10 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
         setCopied(true);
         showToast({
           title: "URL Copied!",
-          description: "Pool URL has been copied to your clipboard",
+          message: "Pool URL has been copied to your clipboard",
           variant: "success"
         });
         
-        // Reset copied state after 2 seconds
         setTimeout(() => {
           setCopied(false);
         }, 2000);
@@ -129,62 +124,16 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
         console.error('Could not copy text: ', err);
         showToast({
           title: "Copy Failed",
-          description: "Failed to copy URL to clipboard",
+          message: "Failed to copy URL to clipboard",
           variant: "error"
         });
       }
     );
   };
 
-  // Fetch pool details
-  useEffect(() => {
-    const fetchPoolDetails = async () => {
-      try {
-        const response = await fetch(`/api/pick-me/pools/${unwrappedParams.id}`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch pool details');
-        }
-        
-        const data = await response.json();
-        setPool(data.pool);
-        setParticipants(data.participants || []);
-        setPrizes(data.prizes || []);
-        
-        // If pool is completed, fetch winners
-        if (data.pool.status === 'completed') {
-          fetchWinners();
-        }
-        // Check if the current user is already a participant
-        await checkUserJoinStatus(data.participants);
-      } catch (err: unknown) {
-        const error = err instanceof Error ? err.message : 'An error occurred';
-        setError(error as string);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchPoolDetails();
-    
-    // Timer for countdown
-    const timer = setInterval(() => {
-      const remaining = getTimeRemaining();
-      setTimeRemaining(remaining);
-      
-      // Auto-refresh when timer ends
-      if (remaining && remaining.minutes === 0 && remaining.seconds === 0) {
-        fetchPoolDetails();
-      }
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, [unwrappedParams.id, fetchWinners, getTimeRemaining]);
-
-  // Fetch winners
   const fetchWinners = useCallback(async () => {
     try {
-      const response = await fetch(`/api/pick-me/pools/${unwrappedParams.id}/draw`);
+      const response = await fetch(`/api/pick-me/pools/${poolId}/draw`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch winners');
@@ -198,9 +147,48 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     } catch (err: unknown) {
       console.error('Error fetching winners:', err);
     }
-  }, [unwrappedParams.id]);
+  }, [poolId]);
 
-  // Handle manual draw winners
+  useEffect(() => {
+    const fetchPoolDetails = async () => {
+      try {
+        const response = await fetch(`/api/pick-me/pools/${poolId}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch pool details');
+        }
+        
+        const data = await response.json();
+        setPool(data.pool);
+        setParticipants(data.participants || []);
+        setPrizes(data.prizes || []);
+        
+        if (data.pool.status === 'completed') {
+          fetchWinners();
+        }
+        await checkUserJoinStatus(data.participants);
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err.message : 'An error occurred';
+        setError(error as string);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchPoolDetails();
+    
+    const timer = setInterval(() => {
+      const remaining = getTimeRemaining();
+      setTimeRemaining(remaining);
+      
+      if (remaining && remaining.minutes === 0 && remaining.seconds === 0) {
+        fetchPoolDetails();
+      }
+    }, 1000);
+    
+    return () => clearInterval(timer);
+  }, [poolId, fetchWinners, getTimeRemaining]);
+
   const handleDrawWinners = async () => {
     if (!confirm('Are you sure you want to draw winners now? This action cannot be undone.')) {
       return;
@@ -209,7 +197,7 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     setIsDrawing(true);
 
     try {
-      const response = await fetch(`/api/pick-me/pools/${unwrappedParams.id}/draw`, {
+      const response = await fetch(`/api/pick-me/pools/${poolId}/draw`, {
         method: 'POST',
       });
 
@@ -220,13 +208,11 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
 
       const data = await response.json();
 
-      // Update the winners state
       setWinners({
         primaryWinners: data.primaryWinners || [],
         backupWinners: data.backupWinners || []
       });
 
-      // Update pool status
       setPool(prev => prev ? { ...prev, status: 'completed' } : null);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred while drawing winners';
@@ -236,19 +222,17 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     }
   };
 
-  // Determine if the current user has already joined this pool
   useEffect(() => {
     if (participants.length > 0) {
-      setHasJoined(false); // Reset, will be updated by checkUserJoinStatus
+      setHasJoined(false);
     }
   }, [participants]);
 
-  // Function to handle joining the pool
   const handleJoinPool = async () => {
     if (hasJoined) {
       showToast({
         title: "Already Joined",
-        description: "You are already a participant in this pool.",
+        message: "You are already a participant in this pool.",
         variant: "info"
       });
       return;
@@ -257,7 +241,7 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     setIsJoining(true);
     
     try {
-      const response = await fetch(`/api/pick-me/pools/${unwrappedParams.id}`, {
+      const response = await fetch(`/api/pick-me/pools/${poolId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -271,19 +255,18 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
           setHasJoined(true);
           showToast({
             title: "Already Joined",
-            description: "You are already a participant in this pool.",
+            message: "You are already a participant in this pool.",
             variant: "info"
           });
         } else {
           throw new Error(data.message || 'Failed to join the pool');
         }
       } else {
-        // Update the participants list with the new participant
         setParticipants(prev => [...prev, data.participant]);
         setHasJoined(true);
         showToast({
           title: "Successfully Joined!",
-          description: "You have been added to the pool. Good luck!",
+          message: "You have been added to the pool. Good luck!",
           variant: "success"
         });
       }
@@ -291,7 +274,7 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
       const error = err instanceof Error ? err.message : 'An error occurred while joining the pool';
       showToast({
         title: "Error",
-        description: error,
+        message: error,
         variant: "error"
       });
     } finally {

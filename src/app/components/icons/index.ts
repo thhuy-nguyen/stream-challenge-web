@@ -23,3 +23,4 @@ export { default as GlobeIcon } from './GlobeIcon';
 export { default as TrophyIcon } from './TrophyIcon';
 export { default as GiftIcon } from './GiftIcon';
 export { default as UsersIcon } from './UsersIcon';
+export { default as GoogleIcon } from './GoogleIcon';

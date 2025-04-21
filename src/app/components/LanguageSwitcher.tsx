@@ -13,7 +13,7 @@ export default function LanguageSwitcher({ className = '', isDarkMode = false })
     setMounted(true);
   }, []);
   
-  const handleLanguageChange = (event) => {
+  const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newLocale = event.target.value;
     
     // Extract the path without the locale prefix

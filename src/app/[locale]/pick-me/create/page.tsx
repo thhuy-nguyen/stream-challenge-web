@@ -11,7 +11,7 @@ import RulesEligibilityStep from './components/RulesEligibilityStep';
 import PrizesStep from './components/PrizesStep';
 import AdvancedSettingsStep from './components/AdvancedSettingsStep';
 import ReviewStep from './components/ReviewStep';
-import { PoolFormData } from './types';
+import { PickMeFormData, Prize } from './types';
 
 export default function PickMeCreatePage() {
   const t = useTranslations('pickMe.create');
@@ -20,18 +20,19 @@ export default function PickMeCreatePage() {
   const supabase = createClient();
   
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState<PoolFormData>({
+  const [formData, setFormData] = useState<PickMeFormData>({
     title: '',
     description: '',
-    numberOfWinners: 1,
-    participantsLimit: 0, // 0 means unlimited
-    eligibilityCriteria: '',
-    rules: '',
-    startTime: new Date().toISOString(),
-    endTime: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
-    prizes: [{ name: '', description: '', image: null }],
-    entryOptions: { subscription: false, follow: false, manual: true },
-    visibility: 'public',
+    entryDuration: 7, // Default: 7 days
+    limitParticipants: false,
+    maxParticipants: 100,
+    subscribersOnly: false,
+    numWinners: 1,
+    numBackupWinners: 0,
+    prizes: [],
+    notificationEnabled: true,
+    autoPublishResults: true,
+    requireVerification: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -50,8 +51,14 @@ export default function PickMeCreatePage() {
     setStep(prevStep => Math.max(prevStep - 1, 1));
   };
 
-  const updateFormData = (data: Partial<PoolFormData>) => {
+  // Function to update all form data
+  const updateFormData = (data: Partial<PickMeFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
+  };
+  
+  // Function specifically for updating prizes array
+  const updatePrizes = (prizes: Prize[]) => {
+    setFormData(prev => ({ ...prev, prizes }));
   };
 
   const handleSubmit = async () => {
@@ -60,39 +67,58 @@ export default function PickMeCreatePage() {
     setIsSubmitting(true);
     
     try {
+      // Calculate end time based on entry duration
+      const now = new Date();
+      const endTime = new Date(now);
+      endTime.setDate(now.getDate() + formData.entryDuration);
+      
       // Format data for the database
       const poolData = {
         title: formData.title,
         description: formData.description,
-        rules: formData.rules,
-        eligibility_criteria: formData.eligibilityCriteria,
-        start_time: formData.startTime,
-        end_time: formData.endTime,
-        number_of_winners: formData.numberOfWinners,
-        participants_limit: formData.participantsLimit,
+        max_participants: formData.limitParticipants ? formData.maxParticipants : null,
+        subscribers_only: formData.subscribersOnly,
+        num_winners: formData.numWinners,
+        num_backup_winners: formData.numBackupWinners,
         creator_id: user.id,
         status: 'active',
-        entry_options: formData.entryOptions,
-        visibility: formData.visibility,
-        prizes: formData.prizes.map(prize => ({
-          name: prize.name,
-          description: prize.description,
-          image_url: prize.image || null,
-        })),
+        created_at: new Date().toISOString(),
+        end_time: endTime.toISOString(),
+        notification_enabled: formData.notificationEnabled,
+        auto_publish_results: formData.autoPublishResults,
+        require_verification: formData.requireVerification
       };
       
       // Insert the pool data
       const { data, error } = await supabase
-        .from('pools')
+        .from('pick_me_pools')
         .insert(poolData)
         .select('id')
         .single();
       
       if (error) throw error;
       
+      // Insert prizes if any
+      if (formData.prizes.length > 0) {
+        const prizesData = formData.prizes.map((prize, index) => ({
+          pool_id: data.id,
+          type: prize.type,
+          description: prize.description,
+          image_url: prize.imageUrl || null,
+          link_url: prize.linkUrl || null,
+          position: index + 1
+        }));
+        
+        const { error: prizesError } = await supabase
+          .from('pick_me_prizes')
+          .insert(prizesData);
+        
+        if (prizesError) throw prizesError;
+      }
+      
       // Redirect to the pool page
       router.push(`/pick-me/pools/${data.id}`);
-    } catch (err: Error | unknown) {
+    } catch (err: unknown) {
       console.error('Error creating pool:', err);
       alert(err instanceof Error ? err.message : 'Failed to create pool. Please try again.');
     } finally {
@@ -145,11 +171,11 @@ export default function PickMeCreatePage() {
           <div className="card-body p-6 md:p-8">
             <form onSubmit={(e) => e.preventDefault()}>
               <div>
-                {step === 1 && <BasicInfoStep formData={formData} updateFormData={updateFormData} />}
-                {step === 2 && <RulesEligibilityStep formData={formData} updateFormData={updateFormData} />}
-                {step === 3 && <PrizesStep formData={formData} updateFormData={updateFormData} />}
-                {step === 4 && <AdvancedSettingsStep formData={formData} updateFormData={updateFormData} />}
-                {step === 5 && <ReviewStep formData={formData} />}
+                {step === 1 && <BasicInfoStep formData={formData} updateForm={updateFormData} />}
+                {step === 2 && <RulesEligibilityStep formData={formData} updateForm={updateFormData} />}
+                {step === 3 && <PrizesStep formData={formData} updatePrizes={updatePrizes} />}
+                {step === 4 && <AdvancedSettingsStep formData={formData} updateForm={updateFormData} />}
+                {step === 5 && <ReviewStep formData={formData} isProcessing={isSubmitting} />}
               </div>
               
               <div className="flex justify-between items-center mt-10 gap-4">

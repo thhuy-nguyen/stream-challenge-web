@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PickMeFormData, Prize } from '../types';
+import { PickMeFormData, Prize, PrizeType } from '../types';
 import { PlusIcon, TrashIcon } from '@/app/components/icons';
 import { useTranslations } from 'next-intl';
 
@@ -28,9 +28,9 @@ const PrizesStep: React.FC<PrizesStepProps> = ({ formData, updatePrizes }) => {
     updateForm({ numBackupWinners: value });
   };
   
-  // Add a new prize
+  // Add a new prize - fix the type issue by using the PrizeType
   const addPrize = () => {
-    const newPrizes = [...formData.prizes, { type: 'text', description: '' }];
+    const newPrizes = [...formData.prizes, { type: 'text' as PrizeType, description: '' }];
     updatePrizes(newPrizes);
   };
   
@@ -133,7 +133,7 @@ const PrizesStep: React.FC<PrizesStepProps> = ({ formData, updatePrizes }) => {
                 <select 
                   className="select select-bordered w-full md:w-1/4 bg-white/5 text-white focus:bg-white/10"
                   value={prize.type}
-                  onChange={(e) => updatePrize(index, { type: e.target.value as 'text' | 'link' | 'image' })}
+                  onChange={(e) => updatePrize(index, { type: e.target.value as PrizeType })}
                 >
                   <option value="text">{t('prizeTypes.text')}</option>
                   <option value="link">{t('prizeTypes.link')}</option>

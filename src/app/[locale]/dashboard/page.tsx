@@ -7,6 +7,15 @@ import { useAuth } from '@/utils/hooks/useAuth';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
 
+// Define interface for pool items
+interface Pool {
+  id: string;
+  title: string;
+  status: 'active' | 'completed' | 'cancelled';
+  end_time: string;
+  created_at: string;
+}
+
 export default function Dashboard() {
   const t = useTranslations('dashboard');
   const commonT = useTranslations('common');
@@ -15,7 +24,8 @@ export default function Dashboard() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
   
-  const [pools, setPools] = useState([]);
+  // Fix type error by properly typing the pools state
+  const [pools, setPools] = useState<Pool[]>([]);
   const [isLoadingPools, setIsLoadingPools] = useState(true);
   const supabase = createClient();
   

@@ -2,10 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 
 // API route for drawing winners for a specific Pick Me pool
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const {id: poolId } = await params;
+    
+    // Extract pool ID from the URL path
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const poolIdIndex = pathParts.findIndex(part => part === 'pools') + 1;
+    const poolId = pathParts[poolIdIndex];
+    
+    if (!poolId) {
+      return NextResponse.json(
+        { message: 'Pool ID not found in URL' }, 
+        { status: 400 }
+      );
+    }
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -159,10 +171,22 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
   }
 }
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const {id: poolId } = await params;
+    
+    // Extract pool ID from the URL path
+    const url = new URL(request.url);
+    const pathParts = url.pathname.split('/');
+    const poolIdIndex = pathParts.findIndex(part => part === 'pools') + 1;
+    const poolId = pathParts[poolIdIndex];
+    
+    if (!poolId) {
+      return NextResponse.json(
+        { message: 'Pool ID not found in URL' }, 
+        { status: 400 }
+      );
+    }
     
     // Check authentication
     const { data: { user }, error: authError } = await supabase.auth.getUser();
