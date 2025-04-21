@@ -1,11 +1,11 @@
 'use client';
 
 import { createClient } from '@/utils/supabase/client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/utils/hooks/useToast';
 import React from 'react';
+import Image from 'next/image';
 
 interface Participant {
   id: string;
@@ -48,7 +48,6 @@ interface PoolDetail {
 export default function PoolDetailPage({ params }: { params: { id: string } }) {
   // Unwrap params with React.use() to prepare for future Next.js versions
   const unwrappedParams = React.use(params);
-  const router = useRouter();
   const [pool, setPool] = useState<PoolDetail | null>(null);
   const [winners, setWinners] = useState<{
     primaryWinners: Winner[];
@@ -67,7 +66,7 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
   const { showToast } = useToast();
 
   // Calculate time remaining for an active pool
-  const getTimeRemaining = () => {
+  const getTimeRemaining = useCallback(() => {
     if (!pool || pool.status !== 'active') return null;
 
     const endTime = new Date(pool.endTime).getTime();
@@ -80,7 +79,7 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
     return { minutes, seconds };
-  };
+  }, [pool]);
 
   const [timeRemaining, setTimeRemaining] = useState(getTimeRemaining());
 
@@ -158,8 +157,9 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
         }
         // Check if the current user is already a participant
         await checkUserJoinStatus(data.participants);
-      } catch (err: any) {
-        setError(err.message || 'An error occurred');
+      } catch (err: unknown) {
+        const error = err instanceof Error ? err.message : 'An error occurred';
+        setError(error as string);
       } finally {
         setIsLoading(false);
       }
@@ -179,10 +179,10 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     }, 1000);
     
     return () => clearInterval(timer);
-  }, [unwrappedParams.id]);
+  }, [unwrappedParams.id, fetchWinners, getTimeRemaining]);
 
   // Fetch winners
-  const fetchWinners = async () => {
+  const fetchWinners = useCallback(async () => {
     try {
       const response = await fetch(`/api/pick-me/pools/${unwrappedParams.id}/draw`);
 
@@ -195,10 +195,10 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
         primaryWinners: data.primaryWinners || [],
         backupWinners: data.backupWinners || []
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error fetching winners:', err);
     }
-  };
+  }, [unwrappedParams.id]);
 
   // Handle manual draw winners
   const handleDrawWinners = async () => {
@@ -228,8 +228,9 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
 
       // Update pool status
       setPool(prev => prev ? { ...prev, status: 'completed' } : null);
-    } catch (err: any) {
-      setError(err.message || 'An error occurred while drawing winners');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred while drawing winners';
+      setError(errorMessage);
     } finally {
       setIsDrawing(false);
     }
@@ -238,28 +239,9 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
   // Determine if the current user has already joined this pool
   useEffect(() => {
     if (participants.length > 0) {
-      setHasJoined(false); // Reset, will be updated by checkUserParticipation
+      setHasJoined(false); // Reset, will be updated by checkUserJoinStatus
     }
   }, [participants]);
-
-  // Function to check if the current user is a participant
-  const checkUserParticipation = async () => {
-    try {
-      const response = await fetch(`/api/user/me`);
-      if (!response.ok) {
-        return; // User not authenticated or other error
-      }
-
-      const userData = await response.json();
-      const userId = userData.id;
-
-      // Check if this user is already in the participants list
-      const isParticipant = participants.some(p => p.userId === userId);
-      setHasJoined(isParticipant);
-    } catch (error) {
-      console.error('Error checking user participation:', error);
-    }
-  };
 
   // Function to handle joining the pool
   const handleJoinPool = async () => {
@@ -305,10 +287,11 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
           variant: "success"
         });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err.message : 'An error occurred while joining the pool';
       showToast({
         title: "Error",
-        description: err.message || 'An error occurred while joining the pool',
+        description: error,
         variant: "error"
       });
     } finally {
@@ -395,7 +378,7 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
                     >
                       {copied ? (
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
                       ) : (
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -487,13 +470,13 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
                     <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
                       <div className="flex flex-col p-2 bg-indigo-800/50 rounded-box text-white">
                         <span className="countdown font-mono text-4xl">
-                          <span style={{ "--value": timeRemaining.minutes } as any}></span>
+                          <span style={{ "--value": timeRemaining.minutes } as React.CSSProperties}></span>
                         </span>
                         min
                       </div> 
                       <div className="flex flex-col p-2 bg-indigo-800/50 rounded-box text-white">
                         <span className="countdown font-mono text-4xl">
-                          <span style={{ "--value": timeRemaining.seconds } as any}></span>
+                          <span style={{ "--value": timeRemaining.seconds } as React.CSSProperties}></span>
                         </span>
                         sec
                       </div>
@@ -570,10 +553,12 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
                       
                       {prize.type === 'image' && prize.imageUrl && (
                         <div className="mt-3">
-                          <img 
+                          <Image 
                             src={prize.imageUrl} 
                             alt={`Prize ${prize.position}`} 
                             className="rounded-lg max-h-40 object-cover mx-auto" 
+                            width={200}
+                            height={200}
                           />
                         </div>
                       )}

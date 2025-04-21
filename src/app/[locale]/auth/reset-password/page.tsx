@@ -1,14 +1,12 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from 'next-intl';
 
 export default function ResetPassword() {
   const t = useTranslations('auth.resetPassword');
-  const router = useRouter();
   
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);

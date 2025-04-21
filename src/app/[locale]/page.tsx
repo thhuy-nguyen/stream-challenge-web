@@ -13,6 +13,9 @@ export default function Home() {
   const router = useRouter();
   const { user, isLoading } = useAuth();
 
+  // Initialize state at the top level, not conditionally
+  const [showVideo, setShowVideo] = useState(false);
+
   // Auto-redirect authenticated users
   useEffect(() => {
     if (!isLoading && user) {
@@ -27,8 +30,6 @@ export default function Home() {
       </div>
     );
   }
-
-  const [showVideo, setShowVideo] = useState(false);
 
   return (
     <AppLayout>

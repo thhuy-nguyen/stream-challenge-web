@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import crypto from 'crypto';
 
 export async function POST(request: NextRequest) {
   try {
@@ -70,10 +69,18 @@ export async function POST(request: NextRequest) {
     
     // Add prizes if provided
     if (prizes && prizes.length > 0) {
-      const validPrizes = prizes.filter((prize: any) => prize.description && prize.description.trim() !== '');
+      // Define proper interface for prize type
+      interface Prize {
+        type: 'text' | 'image' | 'link';
+        description: string;
+        imageUrl?: string;
+        linkUrl?: string;
+      }
+      
+      const validPrizes = prizes.filter((prize: Prize) => prize.description && prize.description.trim() !== '');
       
       if (validPrizes.length > 0) {
-        const prizeEntries = validPrizes.map((prize: any, index: number) => ({
+        const prizeEntries = validPrizes.map((prize: Prize, index: number) => ({
           pool_id: pool.id,
           type: prize.type || 'text',
           description: prize.description,

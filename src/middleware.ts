@@ -21,7 +21,7 @@ const intlMiddleware = createMiddleware({
 // Combine Supabase middleware with next-intl middleware
 export async function middleware(request: NextRequest) {
   // First update Supabase session
-  const response = await updateSession(request);
+  await updateSession(request);
   
   // Get the actual session to check authentication status
   const supabase = createServerClient(

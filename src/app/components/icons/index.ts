@@ -1,6 +1,3 @@
-import React from 'react';
-import Link from 'next/link';
-
 /**
  * Icon components for the Stream Challenge application
  * This file exports reusable icon components used throughout the application

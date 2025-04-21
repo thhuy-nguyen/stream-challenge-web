@@ -86,8 +86,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         displayName: data.displayName,
         profileImageUrl: data.profileImageUrl,
       });
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : 'Login failed. Please try again.';
+      setError(errorMessage);
       throw err;
     } finally {
       setIsLoading(false);
@@ -112,8 +115,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         displayName: data.displayName,
         profileImageUrl: data.profileImageUrl,
       });
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : 'Registration failed. Please try again.';
+      setError(errorMessage);
       throw err;
     } finally {
       setIsLoading(false);
@@ -132,8 +138,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Redirect to the authentication provider
       window.location.href = authUrl;
-    } catch (err: any) {
-      setError(err.response?.data?.message || `${provider} login failed. Please try again.`);
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : `${provider} login failed. Please try again.`;
+      setError(errorMessage);
       setIsLoading(false);
       throw err;
     }

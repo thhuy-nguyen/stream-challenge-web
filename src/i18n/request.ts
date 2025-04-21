@@ -1,5 +1,4 @@
 import {getRequestConfig} from 'next-intl/server';
-import {notFound} from 'next/navigation';
 
 export default getRequestConfig(async ({locale}) => {
   // Check if locale is undefined or not supported

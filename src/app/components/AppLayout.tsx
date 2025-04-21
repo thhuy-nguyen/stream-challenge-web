@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image";
 import Link from "next/link";  // Changed from next-intl
 import { ReactNode } from "react";
 import { useTranslations } from 'next-intl';
@@ -37,7 +36,11 @@ export default function AppLayout({
   return (
     <div className={`min-h-screen ${withGradientBackground ? 'bg-gradient-to-br from-purple-900 via-indigo-800 to-violet-900 text-white' : 'bg-base-100'}`}>
       {showHeader && (
-        <header className="fixed top-0 left-0 right-0 bg-black/10 backdrop-blur-md z-50 border-b border-white/10">
+        <header className={`fixed top-0 left-0 right-0 z-50 ${
+          withGradientBackground 
+            ? 'bg-black/10 backdrop-blur-md border-b border-white/10 text-white'
+            : 'bg-white/90 backdrop-blur-md border-b border-gray-200 text-gray-800 shadow-sm'
+        }`}>
           <div className="container mx-auto px-6 py-4">
             <div className="flex justify-between items-center">
               <Link href="/" className="flex items-center">
@@ -46,7 +49,7 @@ export default function AppLayout({
                     <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="text-lg font-bold text-white">{t('app.name')}</span>
+                <span className={`text-lg font-bold ${withGradientBackground ? 'text-white' : 'text-gray-800'}`}>{t('app.name')}</span>
               </Link>
 
               <div className="hidden md:flex items-center space-x-8">
@@ -54,7 +57,10 @@ export default function AppLayout({
                   <Link 
                     key={link.key} 
                     href={link.href} 
-                    className="text-white/80 hover:text-white transition-colors"
+                    className={withGradientBackground 
+                      ? "text-white/80 hover:text-white transition-colors" 
+                      : "text-gray-600 hover:text-gray-900 transition-colors"
+                    }
                   >
                     {commonT(link.key)}
                   </Link>
@@ -62,11 +68,17 @@ export default function AppLayout({
               </div>
 
               <div className="flex items-center space-x-4">
-                <LanguageSwitcher />
-                <Link href="/auth/login" className="px-4 py-2 text-white/90 hover:text-white transition-colors">
+                <LanguageSwitcher isDarkMode={withGradientBackground} />
+                <Link 
+                  href="/auth/login" 
+                  className={`px-4 py-2 rounded-lg border ${withGradientBackground 
+                    ? "bg-indigo-700 hover:bg-indigo-600 text-white border-indigo-500" 
+                    : "bg-indigo-100 hover:bg-indigo-200 text-indigo-800 border-indigo-200"
+                  }`}
+                >
                   {navT('login')}
                 </Link>
-                <Link href="/auth/register" className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-purple-500/30 transition-all duration-300">
+                <Link href="/auth/register" className="whitespace-nowrap px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-purple-500/30 transition-all duration-300">
                   {navT('signup')}
                 </Link>
               </div>
@@ -75,7 +87,7 @@ export default function AppLayout({
         </header>
       )}
 
-      <main className={`${showHeader ? 'pt-20' : ''}`}>
+      <main className={`${showHeader ? 'pt-18' : ''}`}>
         {children}
       </main>
 

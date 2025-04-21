@@ -48,7 +48,7 @@ export default function ProfilePage() {
         setUsername(data.username || '');
         setBio(data.bio || '');
         setAvatarUrl(data.avatar_url || '');
-      } catch (err: Error | unknown) {
+      } catch (err) {
         console.error('Error fetching profile:', err);
       } finally {
         setIsLoading(false);
@@ -160,6 +160,19 @@ export default function ProfilePage() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              {profileData && (
+                <div>
+                  <label className="block text-white mb-2">{t('email')}</label>
+                  <input
+                    type="email"
+                    value={profileData.email}
+                    disabled
+                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white/70"
+                  />
+                  <p className="text-white/50 text-sm mt-1">{t('emailCannotBeChanged')}</p>
+                </div>
+              )}
+              
               <div>
                 <label className="block text-white mb-2">{t('username')}</label>
                 <input

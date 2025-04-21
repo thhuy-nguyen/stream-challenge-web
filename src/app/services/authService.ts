@@ -57,7 +57,7 @@ export const AuthService = {
       // Try the oauth endpoint first
       const response = await authApi.get(`/api/auth/oauth/${provider}?redirectTo=${redirectTo}`);
       return response.data;
-    } catch (error) {
+    } catch {
       // If that fails, try the oauth2 endpoint
       console.log('Falling back to oauth2 endpoint');
       const fallbackResponse = await authApi.get(`/api/auth/oauth2/url/${provider}`);
