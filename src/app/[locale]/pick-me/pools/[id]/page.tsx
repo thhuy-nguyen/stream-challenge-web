@@ -109,6 +109,34 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
     }
   };
 
+  // Add a function to handle copying the share URL
+  const handleCopyShareUrl = () => {
+    const shareUrl = window.location.href;
+    navigator.clipboard.writeText(shareUrl).then(
+      () => {
+        setCopied(true);
+        showToast({
+          title: "URL Copied!",
+          description: "Pool URL has been copied to your clipboard",
+          variant: "success"
+        });
+        
+        // Reset copied state after 2 seconds
+        setTimeout(() => {
+          setCopied(false);
+        }, 2000);
+      },
+      (err) => {
+        console.error('Could not copy text: ', err);
+        showToast({
+          title: "Copy Failed",
+          description: "Failed to copy URL to clipboard",
+          variant: "error"
+        });
+      }
+    );
+  };
+
   // Fetch pool details
   useEffect(() => {
     const fetchPoolDetails = async () => {
@@ -331,9 +359,10 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
               {pool.status === 'active' ? 'Active selection pool' : pool.status === 'completed' ? 'Completed selection' : 'Cancelled selection'}
             </p>
           </div>
+
           <Link 
             href="/dashboard" 
-            className="btn btn-ghost btn-sm gap-2 text-white/80 hover:text-white"
+            className="btn btn-outline btn-primary gap-2 text-white hover:bg-primary hover:text-white hover:border-primary transition-all self-start shadow-sm hover:shadow-md hover:shadow-primary/30"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -349,6 +378,34 @@ export default function PoolDetailPage({ params }: { params: { id: string } }) {
               <div className="flex-1">
                 <h2 className="text-2xl font-bold text-white">{pool.title}</h2>
                 <p className="text-white/70 mt-2">{pool.description}</p>
+                
+                {/* Share URL feature */}
+                <div className="mt-4 flex flex-col sm:flex-row sm:items-center gap-2">
+                  <div className="relative flex-1">
+                    <input 
+                      type="text" 
+                      value={window.location.href} 
+                      readOnly
+                      className="input input-bordered input-sm w-full bg-indigo-900/30 border-indigo-500/30 text-white pr-10"
+                    />
+                    <button 
+                      onClick={handleCopyShareUrl}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-indigo-300 hover:text-indigo-100 transition-colors"
+                      aria-label="Copy share URL"
+                    >
+                      {copied ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                          <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
                 
                 {/* Join button for non-creators */}
                 {pool.status === 'active' && !pool.isCreator && (

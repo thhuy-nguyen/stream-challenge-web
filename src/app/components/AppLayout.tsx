@@ -1,8 +1,10 @@
 "use client"
 
 import Image from "next/image";
-import Link from "next/link";
+import Link from "next/link";  // Changed from next-intl
 import { ReactNode } from "react";
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from "./LanguageSwitcher";
 
 type AppLayoutProps = {
   children: ReactNode;
@@ -11,7 +13,7 @@ type AppLayoutProps = {
   pageTitle?: string;
   pageDescription?: string;
   withGradientBackground?: boolean;
-  headerLinks?: { name: string; href: string }[];
+  headerLinks?: { key: string; href: string }[];  // Changed from name to key for translation
 };
 
 export default function AppLayout({
@@ -20,12 +22,18 @@ export default function AppLayout({
   showFooter = true,
   withGradientBackground = false,
   headerLinks = [
-    { name: "Features", href: "/#features" },
-    { name: "Benefits", href: "/#benefits" },
-    { name: "How It Works", href: "/#how-it-works" },
-    { name: "Testimonials", href: "/#testimonials" },
+    { key: "features", href: "/#features" },
+    { key: "benefits", href: "/#benefits" },
+    { key: "howItWorks", href: "/#how-it-works" },
+    { key: "testimonials", href: "/#testimonials" },
   ],
 }: AppLayoutProps) {
+  // Initialize translations
+  const t = useTranslations();
+  const commonT = useTranslations('common');
+  const navT = useTranslations('navigation');
+  const footerT = useTranslations('footer');
+
   return (
     <div className={`min-h-screen ${withGradientBackground ? 'bg-gradient-to-br from-purple-900 via-indigo-800 to-violet-900 text-white' : 'bg-base-100'}`}>
       {showHeader && (
@@ -38,27 +46,28 @@ export default function AppLayout({
                     <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="text-lg font-bold text-white">Stream Challenge</span>
+                <span className="text-lg font-bold text-white">{t('app.name')}</span>
               </Link>
 
               <div className="hidden md:flex items-center space-x-8">
                 {headerLinks.map((link) => (
                   <Link 
-                    key={link.name} 
+                    key={link.key} 
                     href={link.href} 
                     className="text-white/80 hover:text-white transition-colors"
                   >
-                    {link.name}
+                    {commonT(link.key)}
                   </Link>
                 ))}
               </div>
 
               <div className="flex items-center space-x-4">
-                <Link href="/login" className="px-4 py-2 text-white/90 hover:text-white transition-colors">
-                  Login
+                <LanguageSwitcher />
+                <Link href="/auth/login" className="px-4 py-2 text-white/90 hover:text-white transition-colors">
+                  {navT('login')}
                 </Link>
-                <Link href="/signup" className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-purple-500/30 transition-all duration-300">
-                  Sign Up
+                <Link href="/auth/register" className="px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-purple-500/30 transition-all duration-300">
+                  {navT('signup')}
                 </Link>
               </div>
             </div>
@@ -81,7 +90,7 @@ export default function AppLayout({
                       <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z" clipRule="evenodd" />
                     </svg>
                   </div>
-                  <span className="text-xl font-bold">Stream Challenge</span>
+                  <span className="text-xl font-bold">{t('app.name')}</span>
                 </div>
                 <p className="text-gray-400 mb-8 pr-8">Gamifying stream interactions since 2025. Empowering creators and viewers alike with innovative engagement tools.</p>
                 <div className="flex space-x-4">
@@ -109,32 +118,32 @@ export default function AppLayout({
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold mb-6">Product</h3>
+                <h3 className="text-lg font-semibold mb-6">{footerT('product')}</h3>
                 <ul className="space-y-4">
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Features</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Pricing</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Documentation</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Integrations</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('features')}</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('pricing')}</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('documentation')}</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('integrations')}</Link></li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold mb-6">Company</h3>
+                <h3 className="text-lg font-semibold mb-6">{footerT('company')}</h3>
                 <ul className="space-y-4">
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">About Us</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Contact</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Blog</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Careers</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('aboutUs')}</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('contact')}</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('blog')}</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('careers')}</Link></li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold mb-6">Legal</h3>
+                <h3 className="text-lg font-semibold mb-6">{footerT('legal')}</h3>
                 <ul className="space-y-4">
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Terms of Service</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Privacy Policy</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">Cookie Policy</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">GDPR</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('termsOfService')}</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('privacyPolicy')}</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('cookiePolicy')}</Link></li>
+                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('gdpr')}</Link></li>
                 </ul>
               </div>
             </div>
@@ -143,14 +152,14 @@ export default function AppLayout({
           <div className="border-t border-gray-800">
             <div className="container mx-auto py-6 px-6 flex flex-col md:flex-row justify-between items-center">
               <div className="text-gray-400 text-sm mb-4 md:mb-0">
-                © 2025 Stream Challenge. All rights reserved.
+                {footerT('copyright')}
               </div>
               <div className="flex space-x-4 text-sm text-gray-400">
-                <Link href="#" className="hover:text-white transition-colors">Status</Link>
+                <Link href="#" className="hover:text-white transition-colors">{footerT('status')}</Link>
                 <span>•</span>
-                <Link href="#" className="hover:text-white transition-colors">Sitemap</Link>
+                <Link href="#" className="hover:text-white transition-colors">{footerT('sitemap')}</Link>
                 <span>•</span>
-                <Link href="#" className="hover:text-white transition-colors">Support</Link>
+                <Link href="#" className="hover:text-white transition-colors">{footerT('support')}</Link>
               </div>
             </div>
           </div>

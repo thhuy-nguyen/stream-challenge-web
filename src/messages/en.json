@@ -1,0 +1,514 @@
+{
+  "app": {
+    "name": "Stream Challenge"
+  },
+  "navigation": {
+    "home": "Home",
+    "login": "Login",
+    "signup": "Sign up",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "settings": "Settings",
+    "help": "Help",
+    "logout": "Logout"
+  },
+  "common": {
+    "features": "Features",
+    "benefits": "Benefits",
+    "howItWorks": "How It Works",
+    "testimonials": "Testimonials",
+    "getStarted": "Get Started",
+    "learnMore": "Learn More",
+    "comingSoon": "Coming Soon",
+    "availableNow": "Available Now",
+    "createAccount": "Create Account",
+    "cancel": "Cancel",
+    "save": "Save Changes",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "continue": "Continue"
+  },
+  "home": {
+    "hero": {
+      "title": "Stream Challenge",
+      "subtitle": "Turn your livestreams into games. Create engagement and interaction with your Audience.",
+      "description": "The perfect platform for improving streamer-viewer engagement",
+      "cta": "Get Started",
+      "watchVideo": "Watch Tutorial",
+      "launch": "Launching April 2025"
+    },
+    "features": {
+      "title": "Powerful Tools for Streamers & Viewers",
+      "description": "Unlock new ways to engage audiences and create memorable streaming moments",
+      "pickMe": {
+        "title": "Pick Me",
+        "description": "Random selection system where streamers randomly select participants from their audience.",
+        "feature1": "Join pools for special events and streams",
+        "feature2": "Get selected at random and fairly",
+        "feature3": "Win prizes and recognition during streams"
+      },
+      "challengeMe": {
+        "title": "Challenge Me",
+        "description": "Viewers create tasks or challenges with rewards, encouraging unique content from streamers.",
+        "feature1": "Submit creative challenges to streamers",
+        "feature2": "Add optional rewards (points or money)",
+        "feature3": "Watch streamers complete your challenge live"
+      }
+    },
+    "benefits": {
+      "title": "Who Benefits?",
+      "description": "Our platform creates value for both sides of the streaming ecosystem",
+      "streamers": {
+        "title": "For Streamers",
+        "benefit1": "Increase engagement and viewer retention",
+        "benefit2": "Build a loyal community",
+        "benefit3": "Add micro-monetization events",
+        "benefit4": "Optimize viewer interaction",
+        "benefit5": "Seamless platform integration"
+      },
+      "viewers": {
+        "title": "For Viewers",
+        "benefit1": "Feel recognized and valued",
+        "benefit2": "Create meaningful interactions",
+        "benefit3": "Simple reward system",
+        "benefit4": "Direct impact on content",
+        "benefit5": "Stand out from the crowd"
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "description": "Get started with just three simple steps",
+      "step1": {
+        "title": "Sign Up",
+        "description": "Create an account as a streamer or viewer and link to streaming platforms like Twitch or YouTube"
+      },
+      "step2": {
+        "title": "Set Up Events",
+        "description": "Streamers create 'Pick Me' events or viewers submit challenges with rewards to enhance streams"
+      },
+      "step3": {
+        "title": "Interact & Reward",
+        "description": "The platform automatically handles selection, tracking, and distribution of rewards"
+      }
+    },
+    "stats": {
+      "activeStreamers": "Active Streamers",
+      "monthlyViewers": "Monthly Viewers",
+      "challengesCompleted": "Challenges Completed",
+      "satisfactionRate": "Satisfaction Rate"
+    },
+    "testimonials": {
+      "title": "What Streamers Are Saying",
+      "description": "Don't just take our word for it"
+    },
+    "cta": {
+      "title": "Ready to Elevate Your Livestreams?",
+      "description": "Join thousands of streamers and viewers taking stream engagement to a new level.",
+      "primary": "Create Free Account",
+      "secondary": "Learn More",
+      "offer": "Limited Time Offer"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot Password?",
+      "signIn": "Sign In",
+      "signingIn": "Signing in...",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create an account",
+      "orContinueWith": "Or continue with",
+      "error": "Invalid email or password"
+    },
+    "register": {
+      "title": "Create an Account",
+      "subtitle": "Join Stream Challenge today",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "displayNameLabel": "Display Name",
+      "displayNamePlaceholder": "Your display name",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Password (min 8 characters)",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "createAccount": "Create Account",
+      "creatingAccount": "Creating account...",
+      "alreadyHaveAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "orContinueWith": "Or continue with",
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "passwordTooShort": "Password must be at least 8 characters",
+        "emailInUse": "Email is already in use"
+      }
+    },
+    "resetPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email to receive a password reset link",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "sendLink": "Send Reset Link",
+      "sending": "Sending...",
+      "backToLogin": "Back to login",
+      "success": "Check your email for the reset link"
+    }
+  },
+  "profile": {
+    "title": "Your Profile",
+    "email": "Email",
+    "displayName": "Display Name",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us about yourself",
+    "socialLinks": "Social Links",
+    "edit": "Edit Profile",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Could not update profile"
+  },
+  "dashboard": {
+    "appName": "Stream Challenge",
+    "appTagline": "Engage with your audience",
+    "online": "Online",
+    "myProfile": "My Profile",
+    "accountSettings": "Account Settings",
+    "welcomeBack": "Welcome back, {name}!",
+    "readyMessage": "Your stream engagement platform is ready",
+    "streamerStatus": "Streamer Status",
+    "dashboardActions": "Actions",
+    "popular": "Popular",
+    "language": "Language",
+    "stats": {
+      "totalChallenges": "Total Challenges",
+      "activeViewers": "Active Viewers",
+      "totalRewards": "Total Rewards",
+      "pickMePools": "Pick Me Pools",
+      "challengesIncrease": "+12% this week",
+      "viewersIncrease": "+18% this week",
+      "rewardsIncrease": "+32% this month",
+      "activePoolsCount": "2 active pools"
+    },
+    "actions": {
+      "createChallenge": {
+        "title": "Create Challenge",
+        "description": "Set up a new engagement challenge for viewers and boost interaction",
+        "button": "Get Started"
+      },
+      "startPickMe": {
+        "title": "Start Pick Me",
+        "description": "Create a selection pool for viewers and randomly pick participants for your stream",
+        "button": "Create Pool"
+      },
+      "streamSettings": {
+        "title": "Stream Settings",
+        "description": "Configure stream integrations and customize viewer engagement experience",
+        "button": "Configure"
+      }
+    },
+    "recentActivity": {
+      "title": "Recent Activity",
+      "viewAll": "View All",
+      "showMore": "Show more activity",
+      "items": {
+        "challengeCompleted": {
+          "title": "Challenge Completed",
+          "description": "User \"GameMaster\" completed the \"Dance Off\" challenge",
+          "points": "+250 Points",
+          "time": "2 minutes ago"
+        },
+        "viewerMilestone": {
+          "title": "New Viewer Milestone",
+          "description": "You've reached over 1,000 concurrent viewers!",
+          "milestone": "Milestone",
+          "time": "45 minutes ago"
+        },
+        "poolCreated": {
+          "title": "New Pick Me Pool Created",
+          "description": "You started a new \"Friday Game Night\" participant pool",
+          "participants": "87 Participants",
+          "time": "1 hour ago"
+        }
+      }
+    },
+    "myPools": {
+      "title": "My Pick Me Pools",
+      "createNew": "Create New",
+      "loadError": "Could not load pools. Please try again later.",
+      "noPools": "You haven't created any pools yet.",
+      "createFirst": "Create your first pool",
+      "table": {
+        "name": "Name",
+        "status": "Status",
+        "endDate": "End Date",
+        "created": "Created",
+        "actions": "Actions"
+      },
+      "status": {
+        "active": "Active",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "actions": {
+        "view": "View"
+      }
+    },
+    "mobileMenu": {
+      "quickActions": "Quick Actions",
+      "newChallenge": "New Challenge",
+      "createPickMe": "Create Pick Me",
+      "streamSettings": "Stream Settings",
+      "navigation": "Navigation"
+    }
+  },
+  "pickMe": {
+    "create": {
+      "title": "Create Pick Me Pool",
+      "subtitle": "Create a random selection pool for your stream audience",
+      "estimatedTime": "~2 minutes to complete",
+      "backToDashboard": "Back to dashboard",
+      "steps": {
+        "basicInfo": "Basic Info",
+        "rulesEligibility": "Rules & Eligibility",
+        "prizes": "Prizes",
+        "advancedSettings": "Advanced Settings",
+        "review": "Review"
+      },
+      "stepCompleted": "Completed",
+      "stepInProgress": "In Progress",
+      "stepIndicator": "Step {current} of {total}: {step}",
+      "percentComplete": "{percent}% Complete",
+      "previous": "Previous",
+      "next": "Next",
+      "processing": "Processing...",
+      "createPool": "Create Pool",
+      "helpText": {
+        "step1": "Choose a clear name so viewers understand what this pool is for",
+        "step2": "Set up who can join your pool and any limitations",
+        "step3": "Define prizes and how many winners you'll select",
+        "step4": "Configure additional settings for your pool",
+        "step5": "Review all details before creating your pool"
+      },
+      "infoCard": {
+        "title": "What is Pick Me?",
+        "quickGuide": "Quick Guide",
+        "description": "Pick Me is a fair way to randomly select viewers from your audience based on your criteria. Great for giveaways, game participation, or any selection process.",
+        "flowSteps": {
+          "step1": "Set up",
+          "step2": "Share link",
+          "step3": "Collect entries",
+          "step4": "Select winners"
+        },
+        "badges": {
+          "engagementBoost": "Engagement Boost",
+          "fairSelection": "Fair Selection",
+          "timeBased": "Time-Based",
+          "addPrizes": "Add Prizes"
+        },
+        "newFeature": {
+          "title": "New Feature: Subscriber Priority",
+          "badge": "NEW",
+          "description": "You can now give subscribers higher chances of being selected",
+          "learnMore": "Learn more about this feature"
+        }
+      },
+      "prizeIdeas": {
+        "title": "Prize Ideas",
+        "categories": {
+          "digital": {
+            "title": "Digital Rewards",
+            "description": "Game codes, custom emotes, sub badges, or digital downloads"
+          },
+          "community": {
+            "title": "Community Privileges",
+            "description": "Special Discord roles, stream shoutouts, or game sessions"
+          },
+          "experience": {
+            "title": "Experience Rewards",
+            "description": "1-1 gaming sessions, personalized content, or choose stream activity"
+          }
+        }
+      },
+      "keyboardShortcuts": {
+        "title": "Keyboard shortcuts:",
+        "nextField": "Next field",
+        "nextStep": "Next step"
+      },
+      "basicInfo": {
+        "title": "Basic Information",
+        "poolName": "Pool Name",
+        "poolNamePlaceholder": "Enter a name for your pool",
+        "poolNameHelp": "Choose a clear name that reflects the purpose of this pool",
+        "description": "Description (Optional)",
+        "descriptionPlaceholder": "What is this pool for? What can participants expect?",
+        "descriptionHelp": "A short description helps participants understand what they're entering",
+        "entryDuration": "Entry Duration",
+        "durationHelp": "How long should this pool accept entries?",
+        "duration": {
+          "1min": "1 minute",
+          "5min": "5 minutes",
+          "10min": "10 minutes",
+          "15min": "15 minutes",
+          "30min": "30 minutes",
+          "1hour": "1 hour",
+          "2hours": "2 hours",
+          "4hours": "4 hours",
+          "8hours": "8 hours",
+          "1day": "1 day"
+        },
+        "tip": {
+          "title": "Tip: Keep it simple",
+          "description": "Short, clear pool names like 'Game Code Giveaway' or 'Select Play-Along Viewer' work best."
+        }
+      },
+      "rulesEligibility": {
+        "title": "Rules & Eligibility",
+        "helpTitle": "Who can participate?",
+        "helpText": "Configure who can join this pool and set limits on the number of participants.",
+        "limitParticipants": {
+          "title": "Limit Number of Participants",
+          "description": "Limit the maximum number of people who can join this pool",
+          "maxCount": "Maximum participant count",
+          "maxHelp": "When this limit is reached, no new entries will be accepted"
+        },
+        "subscribersOnly": {
+          "title": "Subscribers Only",
+          "description": "Limit this pool to only channel subscribers"
+        },
+        "advancedNote": {
+          "title": "Advanced Eligibility",
+          "description": "More advanced eligibility options like follow time or account age can be set in the Advanced Settings step."
+        }
+      },
+      "prizes": {
+        "title": "Winners & Prizes",
+        "winnerCount": "Number of Winners",
+        "winnerHelp": "How many winners should be selected from this pool",
+        "backupCount": "Number of Backup Winners",
+        "backupHelp": "Backup winners in case primary winners are unavailable",
+        "prizeSection": "Prize Details",
+        "prizeInfo": {
+          "title": "About Prizes",
+          "description": "Define what winners will receive. You can add multiple prizes that will be assigned in selection order."
+        },
+        "prizeLabel": "Prize #{number}",
+        "prizePlaceholder": "Enter prize description",
+        "prizeTypes": {
+          "text": "Text",
+          "link": "Link",
+          "image": "Image"
+        },
+        "linkUrl": "Link URL",
+        "linkPlaceholder": "https://example.com/prize",
+        "imageUrl": "Image URL",
+        "imagePlaceholder": "https://example.com/prize-image.jpg",
+        "image": "Image",
+        "removePrize": "Remove Prize",
+        "addPrize": "Add Another Prize",
+        "noPrizes": "No prizes added yet",
+        "getStarted": "Add your first prize"
+      },
+      "advancedSettings": {
+        "title": "Advanced Settings",
+        "helpTitle": "Fine-tune your pool",
+        "helpText": "Configure additional options to customize how your pool operates.",
+        "notifications": {
+          "title": "Enable Notifications",
+          "description": "Automatically send notifications to winners when selected"
+        },
+        "autoPublish": {
+          "title": "Auto-publish Results",
+          "description": "Automatically publish results when entry time expires"
+        },
+        "verification": {
+          "title": "Require Winner Verification",
+          "description": "Winners must verify their identity before receiving prizes",
+          "warning": "This may slow prize distribution but reduces fraud"
+        },
+        "note": {
+          "title": "Other Settings",
+          "description": "Additional settings like custom CSS, custom rules, and API integrations are available in the dashboard after pool creation."
+        }
+      },
+      "review": {
+        "title": "Review Your Pool",
+        "basicInfo": {
+          "title": "Basic Information",
+          "noDescription": "No description provided",
+          "duration": "Open for entries for {minutes} minutes"
+        },
+        "eligibility": {
+          "title": "Eligibility",
+          "limitedParticipants": "Limited to {count} participants",
+          "unlimitedParticipants": "Unlimited participants",
+          "subscribersOnly": "Subscribers only",
+          "openToEveryone": "Open to everyone"
+        },
+        "winners": {
+          "title": "Winner Selection",
+          "count": "{count} winners will be selected",
+          "backupCount": "{count} backup winners"
+        },
+        "prizes": {
+          "title": "Prizes",
+          "noPrizes": "No prizes specified",
+          "image": "Image"
+        },
+        "additionalSettings": {
+          "title": "Additional Settings",
+          "notifications": "Winner notifications",
+          "autoPublish": "Auto-publish results",
+          "verification": "Winner verification",
+          "secureAccess": "Access method",
+          "enabled": "Enabled",
+          "disabled": "Disabled",
+          "yes": "Yes",
+          "no": "No",
+          "privateLink": "Private link",
+          "publicUrl": "Public URL"
+        },
+        "note": {
+          "title": "Ready to create your pool",
+          "description": "After creation, you can share your pool link with your audience so they can enter. You'll be able to manage this pool from your dashboard."
+        },
+        "badges": {
+          "time": "{minutes} mins",
+          "winners": "{count} winners",
+          "backup": "{count} backups",
+          "limit": "Limit: {count}",
+          "subscribers": "Subscribers only"
+        },
+        "settings": {
+          "notifications": "Notifications",
+          "autoPublish": "Auto-publish",
+          "verification": "Verification"
+        }
+      }
+    }
+  },
+  "footer": {
+    "product": "Product",
+    "features": "Features",
+    "pricing": "Pricing",
+    "documentation": "Documentation",
+    "integrations": "Integrations",
+    "company": "Company",
+    "aboutUs": "About Us",
+    "contact": "Contact",
+    "blog": "Blog",
+    "careers": "Careers",
+    "legal": "Legal",
+    "termsOfService": "Terms of Service",
+    "privacyPolicy": "Privacy Policy",
+    "cookiePolicy": "Cookie Policy",
+    "gdpr": "GDPR",
+    "copyright": "© 2025 Stream Challenge. All rights reserved.",
+    "status": "Status",
+    "sitemap": "Sitemap",
+    "support": "Support"
+  }
+}

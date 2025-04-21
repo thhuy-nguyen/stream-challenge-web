@@ -1,43 +1,86 @@
-import { redirect } from 'next/navigation';
-import { createClient } from '@/utils/supabase/server';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { createClient } from '@/utils/supabase/client';
+import { useTranslations } from 'next-intl';
+import LanguageSwitcher from '@/app/components/LanguageSwitcher';
 
-export default async function Dashboard() {
-  const supabase = await createClient();
+export default function Dashboard() {
+  const t = useTranslations('dashboard');
+  const commonT = useTranslations('common');
+  const navT = useTranslations('navigation');
   
-  // Get user data - this is safe to use in server components
-  const { data: { user }, error } = await supabase.auth.getUser();
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [displayName, setDisplayName] = useState('');
+  const [pools, setPools] = useState([]);
+  const [poolsError, setPoolsError] = useState(null);
   
-  // If no user or error, redirect to login
-  if (error || !user) {
-    redirect('/auth/login');
-  }
+  const supabase = createClient();
   
-  // Get user metadata
-  const displayName = user.user_metadata?.display_name || user.email?.split('@')[0];
-
-  // Fetch the user's Pick Me pools
-  const { data: pools, error: poolsError } = await supabase
-    .from('pick_me_pools')
-    .select(`
-      id, 
-      title, 
-      description, 
-      status, 
-      end_time,
-      created_at
-    `)
-    .eq('creator_id', user.id)
-    .order('created_at', { ascending: false });
-  
-  // Function to handle logout (this will be a server action)
-  async function logout() {
-    'use server';
+  useEffect(() => {
+    async function loadUserData() {
+      setIsLoading(true);
+      
+      // Get user data
+      const { data: { user }, error } = await supabase.auth.getUser();
+      
+      // If no user or error, redirect to login
+      if (error || !user) {
+        router.push('/auth/login');
+        return;
+      }
+      
+      setUser(user);
+      
+      // Get user metadata
+      const name = user.user_metadata?.display_name || user.email?.split('@')[0];
+      setDisplayName(name);
+      
+      // Fetch the user's Pick Me pools
+      const { data: poolsData, error: poolsErr } = await supabase
+        .from('pick_me_pools')
+        .select(`
+          id, 
+          title, 
+          description, 
+          status, 
+          end_time,
+          created_at
+        `)
+        .eq('creator_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      if (poolsErr) {
+        setPoolsError(poolsErr);
+      } else {
+        setPools(poolsData || []);
+      }
+      
+      setIsLoading(false);
+    }
     
-    const supabase = await createClient();
+    loadUserData();
+  }, []);
+  
+  const handleLogout = async () => {
     await supabase.auth.signOut();
-    redirect('/auth/login');
+    router.push('/auth/login');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="loading loading-spinner loading-lg text-purple-500"></div>
+          <p className="mt-4 text-white/70">{commonT('loading')}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -54,10 +97,10 @@ export default async function Dashboard() {
                   </svg>
                 </div>
                 <ul tabIndex={0} className="menu dropdown-content mt-3 z-[1] p-2 shadow-lg bg-gradient-to-br from-indigo-900 to-purple-900 rounded-box w-52">
-                  <li><Link href="/dashboard" className="text-white font-medium">Dashboard</Link></li>
-                  <li><Link href="/profile" className="text-white/90">Profile</Link></li>
-                  <li><Link href="/settings" className="text-white/90">Settings</Link></li>
-                  <li><Link href="/help" className="text-white/90">Help</Link></li>
+                  <li><Link href="/dashboard" className="text-white font-medium">{navT('dashboard')}</Link></li>
+                  <li><Link href="/profile" className="text-white/90">{navT('profile')}</Link></li>
+                  <li><Link href="/settings" className="text-white/90">{navT('settings')}</Link></li>
+                  <li><Link href="/help" className="text-white/90">{navT('help')}</Link></li>
                 </ul>
               </div>
               
@@ -68,50 +111,52 @@ export default async function Dashboard() {
                   </svg>
                 </div>
                 <div className="ml-2 flex flex-col">
-                  <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">Stream Challenge</span>
-                  <span className="text-xs text-white/60 -mt-1">Engage Your Audience</span>
+                  <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">{t('appName')}</span>
+                  <span className="text-xs text-white/60 -mt-1">{t('appTagline')}</span>
                 </div>
               </div>
               
               <div className="hidden lg:flex ml-10">
                 <div className="tabs tabs-boxed bg-white/5 p-1 rounded-xl">
-                  <Link href="/dashboard" className="tab tab-md text-white font-medium tab-active bg-white/10">Dashboard</Link>
-                  <Link href="/profile" className="tab tab-md text-white/70 hover:text-white">Profile</Link>
-                  <Link href="/settings" className="tab tab-md text-white/70 hover:text-white">Settings</Link>
-                  <Link href="/help" className="tab tab-md text-white/70 hover:text-white">Help</Link>
+                  <Link href="/dashboard" className="tab tab-md text-white font-medium tab-active bg-white/10">{navT('dashboard')}</Link>
+                  <Link href="/profile" className="tab tab-md text-white/70 hover:text-white">{navT('profile')}</Link>
+                  <Link href="/settings" className="tab tab-md text-white/70 hover:text-white">{navT('settings')}</Link>
+                  <Link href="/help" className="tab tab-md text-white/70 hover:text-white">{navT('help')}</Link>
                 </div>
               </div>
             </div>
             
             <div className="navbar-end">
-              <div className="dropdown dropdown-end">
-                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar online">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 ring ring-purple-500/30 ring-offset-base-100 ring-offset-1 flex items-center justify-center text-white font-bold">
-                    <span className="inline-flex items-center justify-center w-full h-full">
-                      {displayName?.charAt(0).toUpperCase()}
-                    </span>
+              <div className="flex items-center gap-3">
+                <LanguageSwitcher className="w-28" />
+                <div className="dropdown dropdown-end">
+                  <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar online">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 ring ring-purple-500/30 ring-offset-base-100 ring-offset-1 flex items-center justify-center text-white font-bold">
+                      <span className="inline-flex items-center justify-center w-full h-full">
+                        {displayName?.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <ul tabIndex={0} className="menu dropdown-content mt-3 z-[1] p-2 shadow-lg bg-gradient-to-br from-indigo-900 to-purple-900 rounded-box w-52">
-                  <li className="mb-2 disabled">
-                    <a className="text-white font-medium">
-                      <div className="flex flex-col items-start">
-                        <span>{displayName}</span>
-                        <span className="text-xs text-green-400">Online</span>
-                      </div>
-                    </a>
-                  </li>
-                  <div className="divider my-0 h-px bg-white/10"></div>
-                  <li><a className="text-white/90">My Profile</a></li>
-                  <li><a className="text-white/90">Account Settings</a></li>
-                  <li>
-                    <form action={logout}>
-                      <button type="submit" className="text-red-400 w-full text-left">
-                        Logout
+                  <ul tabIndex={0} className="menu dropdown-content mt-3 z-[1] p-2 shadow-lg bg-gradient-to-br from-indigo-900 to-purple-900 rounded-box w-52">
+                    <li className="mb-2 disabled">
+                      <a className="text-white font-medium">
+                        <div className="flex flex-col items-start">
+                          <span>{displayName}</span>
+                          <span className="text-xs text-green-400">{t('online')}</span>
+                        </div>
+                      </a>
+                    </li>
+                    <div className="divider my-0 h-px bg-white/10"></div>
+                    <li><Link href="/profile" className="text-white/90">{t('myProfile')}</Link></li>
+                    <li><Link href="/settings" className="text-white/90">{t('accountSettings')}</Link></li>
+                    <div className="divider my-0 h-px bg-white/10"></div>
+                    <li>
+                      <button onClick={handleLogout} className="text-red-400 w-full text-left">
+                        {navT('logout')}
                       </button>
-                    </form>
-                  </li>
-                </ul>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -125,15 +170,15 @@ export default async function Dashboard() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
               <div>
                 <h2 className="text-3xl font-bold text-white mb-2 flex items-center">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">Welcome back, {displayName}!</span>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-300">{t('welcomeBack', { name: displayName })}</span>
                   <span className="inline-flex ml-2 animate-pulse">👋</span>
                 </h2>
-                <p className="text-white/70">Your stream engagement platform is ready to go</p>
+                <p className="text-white/70">{t('readyMessage')}</p>
               </div>
               
               <div className="mt-4 md:mt-0">
                 <div className="badge badge-ghost gap-2 px-4 py-3 bg-indigo-600/30 text-indigo-300 font-semibold">
-                  Streamer Status: <span className="text-green-400">Online</span>
+                  {t('streamerStatus')}: <span className="text-green-400">{t('online')}</span>
                 </div>
               </div>
             </div>
@@ -141,46 +186,46 @@ export default async function Dashboard() {
             {/* Quick stats */}
             <div className="stats stats-vertical lg:stats-horizontal shadow mt-8 w-full bg-white/5 backdrop-blur-md text-white">
               <div className="stat">
-                <div className="stat-title text-purple-400 text-sm font-medium">Total Challenges</div>
+                <div className="stat-title text-purple-400 text-sm font-medium">{t('stats.totalChallenges')}</div>
                 <div className="stat-value text-white text-2xl">28</div>
                 <div className="stat-desc text-green-400 flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
                   </svg>
-                  +12% this week
+                  {t('stats.challengesIncrease')}
                 </div>
               </div>
               
               <div className="stat">
-                <div className="stat-title text-blue-400 text-sm font-medium">Active Viewers</div>
+                <div className="stat-title text-blue-400 text-sm font-medium">{t('stats.activeViewers')}</div>
                 <div className="stat-value text-white text-2xl">1,254</div>
                 <div className="stat-desc text-green-400 flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
                   </svg>
-                  +18% this week
+                  {t('stats.viewersIncrease')}
                 </div>
               </div>
               
               <div className="stat">
-                <div className="stat-title text-pink-400 text-sm font-medium">Total Rewards</div>
+                <div className="stat-title text-pink-400 text-sm font-medium">{t('stats.totalRewards')}</div>
                 <div className="stat-value text-white text-2xl">$1,840</div>
                 <div className="stat-desc text-green-400 flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clipRule="evenodd" />
                   </svg>
-                  +32% this month
+                  {t('stats.rewardsIncrease')}
                 </div>
               </div>
               
               <div className="stat">
-                <div className="stat-title text-yellow-400 text-sm font-medium">Pick Me Pools</div>
+                <div className="stat-title text-yellow-400 text-sm font-medium">{t('stats.pickMePools')}</div>
                 <div className="stat-value text-white text-2xl">7</div>
                 <div className="stat-desc text-white/70 flex items-center">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
-                  2 active now
+                  {t('stats.activePoolsCount')}
                 </div>
               </div>
             </div>
@@ -192,14 +237,14 @@ export default async function Dashboard() {
           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-purple-400" viewBox="0 0 20 20" fill="currentColor">
             <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
           </svg>
-          Dashboard Actions
+          {t('dashboardActions')}
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Create Challenge Card */}
           <div className="card bg-gradient-to-br from-purple-900/40 to-indigo-900/40 backdrop-blur-xl border border-purple-500/20 shadow-xl hover:shadow-purple-500/10 transition-all duration-300 hover:translate-y-[-5px] overflow-visible">
             <div className="absolute -top-3 right-3">
-              <div className="badge badge-success badge-sm gap-1">Popular</div>
+              <div className="badge badge-success badge-sm gap-1">{t('popular')}</div>
             </div>
             <div className="card-body">
               <div className="bg-purple-500/20 p-3 rounded-lg w-fit mb-4">
@@ -207,11 +252,11 @@ export default async function Dashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="card-title text-white group-hover:text-purple-300 transition-colors">Create Challenge</h3>
-              <p className="text-white/70 text-sm">Set up a new interactive challenge for your viewers and boost engagement</p>
+              <h3 className="card-title text-white group-hover:text-purple-300 transition-colors">{t('actions.createChallenge.title')}</h3>
+              <p className="text-white/70 text-sm">{t('actions.createChallenge.description')}</p>
               <div className="card-actions justify-start mt-4">
                 <button className="btn btn-primary btn-sm">
-                  Get Started
+                  {t('actions.createChallenge.button')}
                 </button>
                 <button className="btn btn-ghost btn-sm btn-circle">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -230,11 +275,11 @@ export default async function Dashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3 className="card-title text-white group-hover:text-blue-300 transition-colors">Start Pick Me</h3>
-              <p className="text-white/70 text-sm">Create a selection pool for your audience and randomly pick participants for your stream</p>
+              <h3 className="card-title text-white group-hover:text-blue-300 transition-colors">{t('actions.startPickMe.title')}</h3>
+              <p className="text-white/70 text-sm">{t('actions.startPickMe.description')}</p>
               <div className="card-actions justify-start mt-4">
                 <Link href="/pick-me/create" className="btn btn-info btn-sm text-white">
-                  Create Pool
+                  {t('actions.startPickMe.button')}
                 </Link>
                 <button className="btn btn-ghost btn-sm btn-circle">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -254,11 +299,11 @@ export default async function Dashboard() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
               </div>
-              <h3 className="card-title text-white group-hover:text-pink-300 transition-colors">Stream Settings</h3>
-              <p className="text-white/70 text-sm">Configure your stream integrations and customize your viewer engagement experience</p>
+              <h3 className="card-title text-white group-hover:text-pink-300 transition-colors">{t('actions.streamSettings.title')}</h3>
+              <p className="text-white/70 text-sm">{t('actions.streamSettings.description')}</p>
               <div className="card-actions justify-start mt-4">
                 <button className="btn btn-secondary btn-sm">
-                  Configure
+                  {t('actions.streamSettings.button')}
                 </button>
                 <button className="btn btn-ghost btn-sm btn-circle">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -270,119 +315,6 @@ export default async function Dashboard() {
           </div>
         </div>
         
-        {/* Recent Activity Section */}
-        <div className="card mt-12 bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl">
-          <div className="card-body">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="card-title text-white/90 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-indigo-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                </svg>
-                Recent Activity
-              </h3>
-              <button className="btn btn-ghost btn-xs text-indigo-400 hover:text-indigo-300">View All</button>
-            </div>
-            
-            <div className="space-y-3">
-              {/* Activity cards using DaisyUI components */}
-              <div className="card bg-white/5 hover:bg-white/10 transition-colors">
-                <div className="card-body p-4 flex flex-row items-center">
-                  <div className="flex-shrink-0 mr-4 w-10 h-10">
-                    <div className="w-full h-full rounded-full bg-green-500/20 flex items-center justify-center text-green-400">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mx-auto my-auto" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex-grow">
-                    <h4 className="text-white font-medium">Challenge completed</h4>
-                    <p className="text-white/60 text-sm">User "GameMaster" completed the "Dance Off" challenge</p>
-                    <div className="mt-2">
-                      <div className="badge badge-success badge-sm gap-1">+250 Points</div>
-                      <span className="text-white/60 text-xs ml-2">2 min ago</span>
-                    </div>
-                  </div>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-ghost btn-sm btn-circle">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card bg-white/5 hover:bg-white/10 transition-colors">
-                <div className="card-body p-4 flex flex-row items-center">
-                  <div className="flex-shrink-0 mr-4 w-10 h-10">
-                    <div className="w-full h-full rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mx-auto my-auto" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex-grow">
-                    <h4 className="text-white font-medium">New viewer milestone</h4>
-                    <p className="text-white/60 text-sm">You've reached 1,000+ concurrent viewers!</p>
-                    <div className="mt-2">
-                      <div className="badge badge-info badge-sm gap-1">Milestone</div>
-                      <span className="text-white/60 text-xs ml-2">45 min ago</span>
-                    </div>
-                  </div>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-ghost btn-sm btn-circle">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card bg-white/5 hover:bg-white/10 transition-colors">
-                <div className="card-body p-4 flex flex-row items-center">
-                  <div className="flex-shrink-0 mr-4 w-10 h-10">
-                    <div className="w-full h-full rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mx-auto my-auto" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex-grow">
-                    <h4 className="text-white font-medium">New Pick Me pool created</h4>
-                    <p className="text-white/60 text-sm">You started a new "Friday Game Night" participant pool</p>
-                    <div className="mt-2">
-                      <div className="badge badge-primary badge-sm gap-1">87 Participants</div>
-                      <span className="text-white/60 text-xs ml-2">1 hour ago</span>
-                    </div>
-                  </div>
-                  <div className="card-actions justify-end">
-                    <button className="btn btn-ghost btn-sm btn-circle">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Only show the "Show more" button if there are more than 3 activities */}
-            {/* For now, this is just a placeholder - in a real app, you would use a variable like totalActivities > 3 */}
-            {true && (
-              <div className="card-actions justify-center mt-4">
-                <button className="btn btn-ghost btn-sm normal-case text-white/50 hover:text-white/80">
-                  Show more activities
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-        
         {/* My Pools Section */}
         <div className="card mt-12 bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl">
           <div className="card-body">
@@ -391,30 +323,30 @@ export default async function Dashboard() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z" />
                 </svg>
-                My Pick Me Pools
+                {t('myPools.title')}
               </h3>
               <Link href="/pick-me/create" className="btn btn-primary btn-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
                 </svg>
-                Create New
+                {t('myPools.createNew')}
               </Link>
             </div>
             
             {poolsError ? (
               <div className="alert alert-error">
-                <p>Failed to load pools. Please try again later.</p>
+                <p>{t('myPools.loadError')}</p>
               </div>
             ) : pools && pools.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="table w-full bg-transparent">
                   <thead>
                     <tr className="text-indigo-300 border-indigo-800/50">
-                      <th>Name</th>
-                      <th>Status</th>
-                      <th>End Date</th>
-                      <th>Created</th>
-                      <th>Actions</th>
+                      <th>{t('myPools.table.name')}</th>
+                      <th>{t('myPools.table.status')}</th>
+                      <th>{t('myPools.table.endDate')}</th>
+                      <th>{t('myPools.table.created')}</th>
+                      <th>{t('myPools.table.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -423,13 +355,13 @@ export default async function Dashboard() {
                         <td className="font-medium">{pool.title}</td>
                         <td>
                           {pool.status === 'active' && (
-                            <span className="badge badge-success">Active</span>
+                            <span className="badge badge-success">{t('myPools.status.active')}</span>
                           )}
                           {pool.status === 'completed' && (
-                            <span className="badge badge-info">Completed</span>
+                            <span className="badge badge-info">{t('myPools.status.completed')}</span>
                           )}
                           {pool.status === 'cancelled' && (
-                            <span className="badge badge-error">Cancelled</span>
+                            <span className="badge badge-error">{t('myPools.status.cancelled')}</span>
                           )}
                         </td>
                         <td>{new Date(pool.end_time).toLocaleDateString()}</td>
@@ -440,7 +372,7 @@ export default async function Dashboard() {
                               href={`/pick-me/pools/${pool.id}`}
                               className="btn btn-xs btn-primary"
                             >
-                              View
+                              {t('myPools.actions.view')}
                             </Link>
                             {pool.status === 'active' && (
                               <button className="btn btn-xs btn-ghost">
@@ -461,9 +393,9 @@ export default async function Dashboard() {
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-indigo-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
-                <p className="mt-4 text-white/70">You haven't created any pools yet.</p>
+                <p className="mt-4 text-white/70">{t('myPools.noPools')}</p>
                 <Link href="/pick-me/create" className="btn btn-primary mt-4">
-                  Create Your First Pool
+                  {t('myPools.createFirst')}
                 </Link>
               </div>
             )}
@@ -483,15 +415,15 @@ export default async function Dashboard() {
           <div className="drawer-side">
             <label htmlFor="quick-menu-drawer" aria-label="close sidebar" className="drawer-overlay"></label>
             <ul className="menu p-4 w-64 min-h-full bg-gradient-to-br from-gray-800 to-indigo-900 text-white">
-              <li className="menu-title text-white/70">Quick Actions</li>
-              <li><a className="text-white">New Challenge</a></li>
-              <li><a className="text-white">Create Pick Me</a></li>
-              <li><a className="text-white">Stream Settings</a></li>
-              <li className="menu-title mt-4 text-white/70">Navigation</li>
-              <li><a className="text-white">Dashboard</a></li>
-              <li><a className="text-white">Profile</a></li>
-              <li><a className="text-white">Settings</a></li>
-              <li><a className="text-white">Help Center</a></li>
+              <li className="menu-title text-white/70">{t('mobileMenu.quickActions')}</li>
+              <li><a className="text-white">{t('mobileMenu.newChallenge')}</a></li>
+              <li><a className="text-white">{t('mobileMenu.createPickMe')}</a></li>
+              <li><a className="text-white">{t('mobileMenu.streamSettings')}</a></li>
+              <li className="menu-title mt-4 text-white/70">{t('mobileMenu.navigation')}</li>
+              <li><a className="text-white">{navT('dashboard')}</a></li>
+              <li><a className="text-white">{navT('profile')}</a></li>
+              <li><a className="text-white">{navT('settings')}</a></li>
+              <li><a className="text-white">{navT('help')}</a></li>
             </ul>
           </div>
         </div>

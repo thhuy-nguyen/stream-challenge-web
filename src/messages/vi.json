@@ -1,0 +1,514 @@
+{
+  "app": {
+    "name": "Stream Challenge"
+  },
+  "navigation": {
+    "home": "Trang chủ",
+    "login": "Đăng nhập",
+    "signup": "Đăng ký",
+    "dashboard": "Bảng điều khiển",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "help": "Trợ giúp",
+    "logout": "Đăng xuất"
+  },
+  "common": {
+    "features": "Tính năng",
+    "benefits": "Lợi ích",
+    "howItWorks": "Cách hoạt động",
+    "testimonials": "Nhận xét",
+    "getStarted": "Bắt đầu",
+    "learnMore": "Tìm hiểu thêm",
+    "comingSoon": "Sắp ra mắt",
+    "availableNow": "Đang có sẵn",
+    "createAccount": "Tạo tài khoản",
+    "cancel": "Hủy",
+    "save": "Lưu thay đổi",
+    "loading": "Đang tải...",
+    "error": "Đã xảy ra lỗi",
+    "success": "Thành công",
+    "continue": "Tiếp tục"
+  },
+  "home": {
+    "hero": {
+      "title": "Stream Challenge",
+      "subtitle": "Biến livestream của bạn thành trò chơi. Tạo sự thu hút và tương tác với Khán giả.",
+      "description": "Nền tảng tối ưu giúp tăng cường tương tác giữa streamer và khán giả",
+      "cta": "Bắt đầu",
+      "watchVideo": "Xem hướng dẫn",
+      "launch": "Ra mắt tháng 4 năm 2025"
+    },
+    "features": {
+      "title": "Công cụ mạnh mẽ cho Streamer & Người xem",
+      "description": "Mở khóa những cách thức mới để thu hút khán giả và tạo ra những khoảnh khắc streaming khó quên",
+      "pickMe": {
+        "title": "Chọn tôi",
+        "description": "Hệ thống chọn ngẫu nhiên nơi streamer chọn người tham gia ngẫu nhiên từ khán giả của họ.",
+        "feature1": "Tham gia các nhóm cho sự kiện và stream đặc biệt",
+        "feature2": "Được chọn ngẫu nhiên và công bằng",
+        "feature3": "Giành giải thưởng và sự công nhận trong các buổi stream"
+      },
+      "challengeMe": {
+        "title": "Thách thức tôi",
+        "description": "Người xem tạo ra nhiệm vụ hoặc thử thách với phần thưởng, khuyến khích nội dung độc đáo từ streamer.",
+        "feature1": "Gửi thử thách sáng tạo cho streamer",
+        "feature2": "Thêm phần thưởng tùy chọn (điểm hoặc tiền)",
+        "feature3": "Xem streamer hoàn thành thử thách của bạn trực tiếp"
+      }
+    },
+    "benefits": {
+      "title": "Ai được hưởng lợi?",
+      "description": "Nền tảng của chúng tôi tạo ra giá trị cho cả hai bên của hệ sinh thái streaming",
+      "streamers": {
+        "title": "Cho Streamer",
+        "benefit1": "Tăng cường tương tác và giữ chân người xem",
+        "benefit2": "Xây dựng cộng đồng trung thành",
+        "benefit3": "Thêm sự kiện nhỏ có thể kiếm tiền",
+        "benefit4": "Tối ưu hóa tương tác với người xem",
+        "benefit5": "Tích hợp liền mạch với nền tảng"
+      },
+      "viewers": {
+        "title": "Cho Người xem",
+        "benefit1": "Cảm thấy được công nhận và đánh giá cao",
+        "benefit2": "Tạo ra những tương tác có ý nghĩa",
+        "benefit3": "Hệ thống phần thưởng đơn giản",
+        "benefit4": "Tác động trực tiếp đến nội dung",
+        "benefit5": "Nổi bật giữa đám đông"
+      }
+    },
+    "howItWorks": {
+      "title": "Cách hoạt động",
+      "description": "Bắt đầu chỉ với ba bước đơn giản",
+      "step1": {
+        "title": "Đăng ký",
+        "description": "Tạo tài khoản với tư cách là streamer hoặc người xem và liên kết với nền tảng streaming như Twitch hoặc YouTube"
+      },
+      "step2": {
+        "title": "Thiết lập sự kiện",
+        "description": "Streamer tạo sự kiện \"Chọn tôi\" hoặc người xem gửi thử thách với phần thưởng để nâng cao stream"
+      },
+      "step3": {
+        "title": "Tương tác & Khen thưởng",
+        "description": "Nền tảng tự động xử lý việc lựa chọn, theo dõi và phân phối phần thưởng"
+      }
+    },
+    "stats": {
+      "activeStreamers": "Streamer đang hoạt động",
+      "monthlyViewers": "Người xem hàng tháng",
+      "challengesCompleted": "Thử thách đã hoàn thành",
+      "satisfactionRate": "Tỷ lệ hài lòng"
+    },
+    "testimonials": {
+      "title": "Streamer nói gì",
+      "description": "Đừng chỉ tin lời chúng tôi"
+    },
+    "cta": {
+      "title": "Bạn đã sẵn sàng để cải tiến Livestream của mình?",
+      "description": "Tham gia cùng hàng ngàn streamer và người xem đang nâng cao tương tác stream lên tầm cao mới.",
+      "primary": "Tạo tài khoản miễn phí",
+      "secondary": "Tìm hiểu thêm",
+      "offer": "Ưu đãi thời gian giới hạn"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Chào mừng trở lại",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "passwordLabel": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu của bạn",
+      "forgotPassword": "Quên mật khẩu?",
+      "signIn": "Đăng nhập",
+      "signingIn": "Đang đăng nhập...",
+      "noAccount": "Chưa có tài khoản?",
+      "createAccount": "Tạo tài khoản",
+      "orContinueWith": "Hoặc tiếp tục với",
+      "error": "Email hoặc mật khẩu không hợp lệ"
+    },
+    "register": {
+      "title": "Tạo tài khoản",
+      "subtitle": "Tham gia Stream Challenge ngay hôm nay",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "displayNameLabel": "Tên hiển thị",
+      "displayNamePlaceholder": "Tên hiển thị của bạn",
+      "passwordLabel": "Mật khẩu",
+      "passwordPlaceholder": "Mật khẩu (ít nhất 8 ký tự)",
+      "confirmPasswordLabel": "Xác nhận mật khẩu",
+      "confirmPasswordPlaceholder": "Xác nhận mật khẩu",
+      "createAccount": "Tạo tài khoản",
+      "creatingAccount": "Đang tạo tài khoản...",
+      "alreadyHaveAccount": "Đã có tài khoản?",
+      "signIn": "Đăng nhập",
+      "orContinueWith": "Hoặc tiếp tục với",
+      "errors": {
+        "passwordMismatch": "Mật khẩu không khớp",
+        "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự",
+        "emailInUse": "Email đã được sử dụng"
+      }
+    },
+    "resetPassword": {
+      "title": "Đặt lại mật khẩu",
+      "subtitle": "Nhập email của bạn để nhận liên kết đặt lại mật khẩu",
+      "emailLabel": "Email",
+      "emailPlaceholder": "you@example.com",
+      "sendLink": "Gửi liên kết đặt lại",
+      "sending": "Đang gửi...",
+      "backToLogin": "Quay lại đăng nhập",
+      "success": "Kiểm tra email của bạn để lấy liên kết đặt lại mật khẩu"
+    }
+  },
+  "profile": {
+    "title": "Hồ sơ của bạn",
+    "email": "Email",
+    "displayName": "Tên hiển thị",
+    "bio": "Tiểu sử",
+    "bioPlaceholder": "Hãy kể về bản thân",
+    "socialLinks": "Liên kết mạng xã hội",
+    "edit": "Chỉnh sửa hồ sơ",
+    "save": "Lưu thay đổi",
+    "cancel": "Hủy",
+    "updateSuccess": "Cập nhật hồ sơ thành công",
+    "updateError": "Không thể cập nhật hồ sơ"
+  },
+  "dashboard": {
+    "appName": "Stream Challenge",
+    "appTagline": "Tương tác với khán giả",
+    "online": "Trực tuyến",
+    "myProfile": "Hồ sơ của tôi",
+    "accountSettings": "Cài đặt tài khoản",
+    "welcomeBack": "Chào mừng trở lại, {name}!",
+    "readyMessage": "Nền tảng tương tác stream của bạn đã sẵn sàng",
+    "streamerStatus": "Trạng thái Streamer",
+    "dashboardActions": "Các tác vụ",
+    "popular": "Phổ biến",
+    "language": "Ngôn ngữ",
+    "stats": {
+      "totalChallenges": "Tổng thử thách",
+      "activeViewers": "Người xem đang hoạt động",
+      "totalRewards": "Tổng phần thưởng",
+      "pickMePools": "Sự kiện rút thăm",
+      "challengesIncrease": "+12% tuần này",
+      "viewersIncrease": "+18% tuần này",
+      "rewardsIncrease": "+32% tháng này",
+      "activePoolsCount": "2 nhóm đang hoạt động"
+    },
+    "actions": {
+      "createChallenge": {
+        "title": "Tạo thử thách",
+        "description": "Thiết lập thử thách tương tác mới cho người xem và tăng cường tương tác",
+        "button": "Bắt đầu"
+      },
+      "startPickMe": {
+        "title": "Bắt đầu Chọn Tôi",
+        "description": "Tạo nhóm lựa chọn cho khán giả và chọn ngẫu nhiên người tham gia cho stream của bạn",
+        "button": "Tạo nhóm"
+      },
+      "streamSettings": {
+        "title": "Cài đặt Stream",
+        "description": "Cấu hình tích hợp stream và tùy chỉnh trải nghiệm tương tác với người xem",
+        "button": "Cấu hình"
+      }
+    },
+    "recentActivity": {
+      "title": "Hoạt động gần đây",
+      "viewAll": "Xem tất cả",
+      "showMore": "Hiển thị thêm hoạt động",
+      "items": {
+        "challengeCompleted": {
+          "title": "Đã hoàn thành thử thách",
+          "description": "Người dùng \"GameMaster\" đã hoàn thành thử thách \"Dance Off\"",
+          "points": "+250 Điểm",
+          "time": "2 phút trước"
+        },
+        "viewerMilestone": {
+          "title": "Cột mốc người xem mới",
+          "description": "Bạn đã đạt hơn 1,000 người xem đồng thời!",
+          "milestone": "Cột mốc",
+          "time": "45 phút trước"
+        },
+        "poolCreated": {
+          "title": "Đã tạo Sự Kiện Rút Thăm mới",
+          "description": "Bạn đã bắt đầu sự kiện người tham gia \"Đêm chơi game thứ Sáu\" mới",
+          "participants": "87 Người tham gia",
+          "time": "1 giờ trước"
+        }
+      }
+    },
+    "myPools": {
+      "title": "Sự kiện Rút Thăm của tôi",
+      "createNew": "Tạo mới",
+      "loadError": "Không thể tải sự kiện. Vui lòng thử lại sau.",
+      "noPools": "Bạn chưa tạo sự kiện nào.",
+      "createFirst": "Tạo sự kiện đầu tiên",
+      "table": {
+        "name": "Tên",
+        "status": "Trạng thái",
+        "endDate": "Ngày kết thúc",
+        "created": "Đã tạo",
+        "actions": "Thao tác"
+      },
+      "status": {
+        "active": "Đang hoạt động",
+        "completed": "Đã hoàn thành",
+        "cancelled": "Đã hủy"
+      },
+      "actions": {
+        "view": "Xem"
+      }
+    },
+    "mobileMenu": {
+      "quickActions": "Thao tác nhanh",
+      "newChallenge": "Thử thách mới",
+      "createPickMe": "Tạo Chọn Tôi",
+      "streamSettings": "Cài đặt Stream",
+      "navigation": "Điều hướng"
+    }
+  },
+  "pickMe": {
+    "create": {
+      "title": "Tạo Sự kiện Pick Me",
+      "subtitle": "Tạo sự kiện rút thăm ngẫu nhiên cho khán giả của bạn",
+      "estimatedTime": "~2 phút để hoàn thành",
+      "backToDashboard": "Quay lại bảng điều khiển",
+      "steps": {
+        "basicInfo": "Thông tin cơ bản",
+        "rulesEligibility": "Quy tắc & Điều kiện",
+        "prizes": "Giải thưởng",
+        "advancedSettings": "Cài đặt nâng cao",
+        "review": "Xem lại"
+      },
+      "stepCompleted": "Đã hoàn thành",
+      "stepInProgress": "Đang thực hiện",
+      "stepIndicator": "Bước {current} của {total}: {step}",
+      "percentComplete": "Hoàn thành {percent}%",
+      "previous": "Trước",
+      "next": "Tiếp theo",
+      "processing": "Đang xử lý...",
+      "createPool": "Tạo sự kiện rút thăm",
+      "helpText": {
+        "step1": "Chọn tên rõ ràng để người xem hiểu sự kiện này dùng để làm gì",
+        "step2": "Thiết lập ai có thể tham gia sự kiện của bạn và các giới hạn",
+        "step3": "Xác định giải thưởng và số người chiến thắng bạn sẽ chọn",
+        "step4": "Cấu hình cài đặt bổ sung cho sự kiện của bạn",
+        "step5": "Xem lại tất cả chi tiết trước khi tạo sự kiện"
+      },
+      "infoCard": {
+        "title": "Pick Me là gì?",
+        "quickGuide": "Hướng dẫn nhanh",
+        "description": "Pick Me là sự kiện công bằng để chọn ngẫu nhiên người chiến thắng dựa trên tiêu chí của bạn. Hoàn hảo cho các chương trình quà tặng, hoặc bất kỳ quy trình lựa chọn nào khác.",
+        "flowSteps": {
+          "step1": "Thiết lập",
+          "step2": "Chia sẻ liên kết",
+          "step3": "Thu thập đăng ký",
+          "step4": "Chọn người thắng"
+        },
+        "badges": {
+          "engagementBoost": "Tăng tương tác",
+          "fairSelection": "Lựa chọn công bằng",
+          "timeBased": "Dựa trên thời gian",
+          "addPrizes": "Thêm giải thưởng"
+        },
+        "newFeature": {
+          "title": "Tính năng mới: Ưu tiên người đăng ký",
+          "badge": "MỚI",
+          "description": "Bây giờ bạn có thể cho người đăng ký cơ hội cao hơn để được chọn",
+          "learnMore": "Tìm hiểu thêm về tính năng này"
+        }
+      },
+      "prizeIdeas": {
+        "title": "Ý tưởng giải thưởng",
+        "categories": {
+          "digital": {
+            "title": "Phần thưởng kỹ thuật số",
+            "description": "Mã game, biểu tượng cảm xúc, huy hiệu người đăng ký, hoặc nội dung số tải về"
+          },
+          "community": {
+            "title": "Đặc quyền cộng đồng",
+            "description": "Vai trò đặc biệt trong Discord, shoutout trong stream, hoặc cùng chơi game"
+          },
+          "experience": {
+            "title": "Phần thưởng trải nghiệm",
+            "description": "Chơi game 1-1, nội dung cá nhân hóa, hoặc chọn hoạt động stream"
+          }
+        }
+      },
+      "keyboardShortcuts": {
+        "title": "Phím tắt:",
+        "nextField": "Trường tiếp theo",
+        "nextStep": "Bước tiếp theo"
+      },
+      "basicInfo": {
+        "title": "Thông tin cơ bản",
+        "poolName": "Tên sự kiện",
+        "poolNamePlaceholder": "Nhập tên cho sự kiện của bạn",
+        "poolNameHelp": "Chọn tên rõ ràng thể hiện mục đích của đợt rút thăm này",
+        "description": "Mô tả (Tùy chọn)",
+        "descriptionPlaceholder": "Sự kiện này dùng để làm gì? Người tham gia có thể mong đợi điều gì?",
+        "descriptionHelp": "Mô tả ngắn giúp người tham gia hiểu họ đang tham gia vào điều gì",
+        "entryDuration": "Thời gian mở đăng ký",
+        "durationHelp": "Sự kiện này nên nhận đăng ký trong bao lâu?",
+        "duration": {
+          "1min": "1 phút",
+          "5min": "5 phút",
+          "10min": "10 phút",
+          "15min": "15 phút",
+          "30min": "30 phút",
+          "1hour": "1 giờ",
+          "2hours": "2 giờ",
+          "4hours": "4 giờ",
+          "8hours": "8 giờ",
+          "1day": "1 ngày"
+        },
+        "tip": {
+          "title": "Mẹo: Giữ đơn giản",
+          "description": "Tên sự kiện ngắn gọn, rõ ràng như 'Tặng mã game' hoặc 'Chọn người chơi cùng' sẽ hiệu quả nhất."
+        }
+      },
+      "rulesEligibility": {
+        "title": "Quy tắc & Điều kiện",
+        "helpTitle": "Ai có thể tham gia?",
+        "helpText": "Cấu hình ai có thể tham gia sự kiện này và đặt giới hạn về số lượng người tham gia.",
+        "limitParticipants": {
+          "title": "Giới hạn số người tham gia",
+          "description": "Giới hạn số lượng tối đa người có thể tham gia sự kiện này",
+          "maxCount": "Số người tham gia tối đa",
+          "maxHelp": "Khi đạt đến giới hạn này, không có đăng ký mới nào được chấp nhận"
+        },
+        "subscribersOnly": {
+          "title": "Chỉ người đăng ký",
+          "description": "Giới hạn sự kiện này chỉ cho người đăng ký kênh"
+        },
+        "advancedNote": {
+          "title": "Điều kiện nâng cao",
+          "description": "Các tùy chọn điều kiện nâng cao hơn như thời gian theo dõi hoặc tuổi tài khoản có thể được thiết lập trong bước Cài đặt nâng cao."
+        }
+      },
+      "prizes": {
+        "title": "Người thắng & Giải thưởng",
+        "winnerCount": "Số người thắng",
+        "winnerHelp": "Bao nhiêu người thắng nên được chọn từ sự kiện này",
+        "backupCount": "Số người thắng dự phòng",
+        "backupHelp": "Người thắng dự phòng trong trường hợp người thắng chính không có mặt hoặc không đủ điều kiện",
+        "prizeSection": "Chi tiết giải thưởng",
+        "prizeInfo": {
+          "title": "Về giải thưởng",
+          "description": "Xác định những gì người thắng sẽ nhận được. Bạn có thể thêm nhiều giải thưởng sẽ được gán theo thứ tự lựa chọn."
+        },
+        "prizeLabel": "Giải thưởng #{number}",
+        "prizePlaceholder": "Nhập mô tả giải thưởng",
+        "prizeTypes": {
+          "text": "Văn bản",
+          "link": "Liên kết",
+          "image": "Hình ảnh"
+        },
+        "linkUrl": "URL liên kết",
+        "linkPlaceholder": "https://example.com/prize",
+        "imageUrl": "URL hình ảnh",
+        "imagePlaceholder": "https://example.com/prize-image.jpg",
+        "image": "Hình ảnh",
+        "removePrize": "Xóa giải thưởng",
+        "addPrize": "Thêm giải thưởng khác",
+        "noPrizes": "Chưa có giải thưởng nào được thêm vào",
+        "getStarted": "Thêm giải thưởng đầu tiên"
+      },
+      "advancedSettings": {
+        "title": "Cài đặt nâng cao",
+        "helpTitle": "Tinh chỉnh sự kiện của bạn",
+        "helpText": "Cấu hình các tùy chọn bổ sung để tùy chỉnh cách sự kiện của bạn hoạt động.",
+        "notifications": {
+          "title": "Bật thông báo",
+          "description": "Tự động gửi thông báo cho người thắng khi được chọn"
+        },
+        "autoPublish": {
+          "title": "Tự động công bố kết quả",
+          "description": "Tự động công bố kết quả khi thời gian đăng ký kết thúc"
+        },
+        "verification": {
+          "title": "Yêu cầu xác minh người thắng",
+          "description": "Người thắng phải xác minh danh tính trước khi nhận giải thưởng",
+          "warning": "Điều này có thể làm chậm việc phân phối giải thưởng nhưng giảm gian lận"
+        },
+        "note": {
+          "title": "Cài đặt khác",
+          "description": "Các cài đặt bổ sung như CSS tùy chỉnh, quy tắc tùy chỉnh và tích hợp API có sẵn trong bảng điều khiển sau khi tạo sự kiện."
+        }
+      },
+      "review": {
+        "title": "Xem lại sự kiện rút thăm của bạn",
+        "basicInfo": {
+          "title": "Thông tin cơ bản",
+          "noDescription": "Không có mô tả nào được cung cấp",
+          "duration": "Mở cho đăng ký trong {minutes} phút"
+        },
+        "eligibility": {
+          "title": "Điều kiện",
+          "limitedParticipants": "Giới hạn {count} người tham gia",
+          "unlimitedParticipants": "Không giới hạn người tham gia",
+          "subscribersOnly": "Chỉ người đăng ký",
+          "openToEveryone": "Mở cho tất cả mọi người"
+        },
+        "winners": {
+          "title": "Lựa chọn người thắng",
+          "count": "{count} người thắng sẽ được chọn",
+          "backupCount": "{count} người thắng dự phòng"
+        },
+        "prizes": {
+          "title": "Giải thưởng",
+          "noPrizes": "Không có giải thưởng nào được chỉ định",
+          "image": "Hình ảnh"
+        },
+        "additionalSettings": {
+          "title": "Cài đặt bổ sung",
+          "notifications": "Thông báo người thắng",
+          "autoPublish": "Tự động công bố kết quả",
+          "verification": "Xác minh người thắng",
+          "secureAccess": "Phương thức truy cập",
+          "enabled": "Đã bật",
+          "disabled": "Đã tắt",
+          "yes": "Có",
+          "no": "Không",
+          "privateLink": "Liên kết riêng tư",
+          "publicUrl": "URL công khai"
+        },
+        "note": {
+          "title": "Sẵn sàng tạo sự kiện rút thăm của bạn",
+          "description": "Sau khi tạo, bạn có thể chia sẻ liên kết sự kiện với khán giả để họ có thể tham gia. Bạn sẽ có thể quản lý sự kiện này từ bảng điều khiển của mình."
+        },
+        "badges": {
+          "time": "{minutes} phút",
+          "winners": "{count} người thắng",
+          "backup": "{count} dự phòng",
+          "limit": "Giới hạn: {count}",
+          "subscribers": "Chỉ người đăng ký"
+        },
+        "settings": {
+          "notifications": "Thông báo",
+          "autoPublish": "Tự động công bố",
+          "verification": "Xác minh"
+        }
+      }
+    }
+  },
+  "footer": {
+    "product": "Sản phẩm",
+    "features": "Tính năng",
+    "pricing": "Giá cả",
+    "documentation": "Tài liệu",
+    "integrations": "Tích hợp",
+    "company": "Công ty",
+    "aboutUs": "Về chúng tôi",
+    "contact": "Liên hệ",
+    "blog": "Blog",
+    "careers": "Tuyển dụng",
+    "legal": "Pháp lý",
+    "termsOfService": "Điều khoản dịch vụ",
+    "privacyPolicy": "Chính sách bảo mật",
+    "cookiePolicy": "Chính sách cookie",
+    "gdpr": "GDPR",
+    "copyright": "© 2025 Stream Challenge. Đã đăng ký bản quyền.",
+    "status": "Trạng thái",
+    "sitemap": "Sơ đồ trang",
+    "support": "Hỗ trợ"
+  }
+}

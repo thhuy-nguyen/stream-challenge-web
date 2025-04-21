@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 // Import types
 import { PickMeFormData, Prize } from './types';
@@ -17,12 +18,19 @@ import {
 } from './components';
 
 // Import icons
-import { ChevronLeftIcon, ChevronRightIcon } from '../../components/icons';
+import { ChevronLeftIcon, ChevronRightIcon } from '@/app/components/icons';
 
 export default function CreatePickMePage() {
+  const t = useTranslations('pickMe.create');
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
-  const steps = ['Basic Info', 'Rules & Eligibility', 'Prizes', 'Advanced Settings', 'Review'];
+  const steps = [
+    t('steps.basicInfo'),
+    t('steps.rulesEligibility'),
+    t('steps.prizes'),
+    t('steps.advancedSettings'),
+    t('steps.review')
+  ];
   
   // Form state
   const [formData, setFormData] = useState<PickMeFormData>({
@@ -214,28 +222,28 @@ export default function CreatePickMePage() {
         <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 animate-fade-in-down">
           <div>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-indigo-100 to-indigo-300 drop-shadow-md">
-              Create a Pick Me Pool
+              {t('title')}
             </h1>
             <p className="text-indigo-300 mt-2 max-w-2xl leading-relaxed">
-              Set up a random selection pool for your audience to participate in
+              {t('subtitle')}
               <span className="ml-2 text-xs bg-indigo-500/30 px-2 py-1 rounded-full">
-                Est. time: 2-3 min
+                {t('estimatedTime')}
               </span>
             </p>
           </div>
           <Link 
             href="/dashboard" 
-            className="btn btn-ghost gap-2 text-white/80 hover:text-white hover:bg-white/10 transition-all self-start"
+            className="btn btn-outline btn-primary gap-2 text-white hover:bg-primary hover:text-white hover:border-primary transition-all self-start shadow-sm hover:shadow-md hover:shadow-primary/30"
           >
             <ChevronLeftIcon className="h-5 w-5" />
-            Back to Dashboard
+            {t('backToDashboard')}
           </Link>
         </div>
         
         {/* Steps with enhanced visual feedback */}
         <div className="card bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl mb-8 overflow-hidden hover:border-white/20 transition-all duration-300 animate-fade-in-up">
           <div className="card-body p-6">
-                        <ul className="steps steps-horizontal w-full">
+            <ul className="steps steps-horizontal w-full">
               {steps.map((step, index) => (
                 <li 
                   key={index} 
@@ -259,10 +267,10 @@ export default function CreatePickMePage() {
                     
                     {/* Step completion status */}
                     {index < currentStep && (
-                      <span className="text-xs text-green-400 mt-1">Completed</span>
+                      <span className="text-xs text-green-400 mt-1">{t('stepCompleted')}</span>
                     )}
                     {index === currentStep && (
-                      <span className="text-xs text-blue-400 mt-1">In Progress</span>
+                      <span className="text-xs text-blue-400 mt-1">{t('stepInProgress')}</span>
                     )}
                   </div>
                 </li>
@@ -283,21 +291,11 @@ export default function CreatePickMePage() {
               </div>
             )}
             
-            {/* Success message when moving between steps */}
-            {saveSuccess && (
-              <div className="alert alert-success mb-6 animate-fade-out">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Progress saved! Continuing to next step.</span>
-              </div>
-            )}
-            
-            <form onSubmit={currentStep === steps.length - 1 ? handleSubmit : (e) => e.preventDefault()}>
+            <form onSubmit={(e) => e.preventDefault()}>
               {/* Current step indicator for mobile */}
               <div className="mb-6 text-center md:hidden">
                 <span className="text-sm text-white/70">
-                  Step {currentStep + 1} of {steps.length}: <span className="font-medium text-white">{steps[currentStep]}</span>
+                  {t('stepIndicator', { current: currentStep + 1, total: steps.length, step: steps[currentStep] })}
                 </span>
               </div>
               
@@ -306,26 +304,26 @@ export default function CreatePickMePage() {
               </div>
               
               {/* Enhanced Navigation Buttons */}
-              <div className="flex flex-col sm:flex-row justify-between items-center mt-10 gap-4 animate-fade-in animate-delay-500">
+              <div className="flex justify-between items-center mt-10 gap-4 animate-fade-in animate-delay-500">
                 <button 
                   type="button" 
-                  className="btn btn-ghost text-white/70 hover:text-white group w-full sm:w-auto"
+                  className="btn btn-outline text-white hover:bg-white/10 hover:text-white hover:border-white/40 group shadow-sm hover:shadow-md"
                   onClick={goToPreviousStep}
                   disabled={currentStep === 0}
                 >
                   <ChevronLeftIcon className="h-5 w-5 mr-2 transform group-hover:-translate-x-1 transition-transform" />
-                  Previous
+                  {t('previous')}
                 </button>
                 
                 {/* Show form progress on mobile */}
-                <div className="order-first sm:order-none w-full sm:w-auto text-center sm:hidden">
-                  <span className="text-xs text-white/60">{progressPercentage}% Complete</span>
+                <div className="hidden xs:block text-center">
+                  <span className="text-xs text-white/60">{t('percentComplete', { percent: progressPercentage })}</span>
                 </div>
                 
                 {currentStep < steps.length - 1 ? (
                   <button 
                     type="button" 
-                    className="btn btn-primary group rounded-lg transition-all hover:shadow-lg hover:shadow-indigo-500/30 w-full sm:w-auto relative overflow-hidden"
+                    className="btn btn-primary group rounded-lg transition-all hover:shadow-lg hover:shadow-indigo-500/30 relative overflow-hidden"
                     onClick={goToNextStep}
                     disabled={!canProceed()}
                   >
@@ -334,14 +332,15 @@ export default function CreatePickMePage() {
                       <span className="absolute inset-0 bg-white/20 animate-pulse-slow rounded-lg"></span>
                     )}
                     <span className="relative z-10 flex items-center">
-                      Next
+                      {t('next')}
                       <ChevronRightIcon className="h-5 w-5 ml-2 transform group-hover:translate-x-1 transition-transform" />
                     </span>
                   </button>
                 ) : (
                   <button 
-                    type="submit" 
-                    className="btn bg-gradient-to-r from-primary to-secondary rounded-lg group hover:shadow-lg hover:shadow-indigo-500/30 transition-all border-0 w-full sm:w-auto relative overflow-hidden" 
+                    type="button" 
+                    className="btn bg-gradient-to-r from-primary to-secondary rounded-lg group hover:shadow-lg hover:shadow-indigo-500/30 transition-all border-0 relative overflow-hidden min-w-[160px] whitespace-nowrap" 
+                    onClick={handleSubmit}
                     disabled={isProcessing}
                   >
                     {/* Add subtle shine effect to final button */}
@@ -349,15 +348,15 @@ export default function CreatePickMePage() {
                       <span className="absolute inset-0 w-1/3 h-full bg-white/20 skew-x-15 transform -translate-x-full animate-shine"></span>
                     )}
                     
-                    <span className="relative z-10">
+                    <span className="relative z-10 flex items-center justify-center">
                       {isProcessing ? (
                         <>
-                          <span className="loading loading-spinner loading-sm"></span>
-                          Processing...
+                          <span className="loading loading-spinner loading-sm mr-2"></span>
+                          {t('processing')}
                         </>
                       ) : (
                         <>
-                          Create Pick Me Pool
+                          {t('createPool')}
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 transform group-hover:translate-x-1 transition-transform" viewBox="0 0 20 20" fill="currentColor">
                             <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
                           </svg>
@@ -368,14 +367,19 @@ export default function CreatePickMePage() {
                 )}
               </div>
               
+              {/* Mobile progress indicator */}
+              <div className="flex justify-center mt-4 xs:hidden">
+                <span className="text-xs text-white/60">{t('percentComplete', { percent: progressPercentage })}</span>
+              </div>
+              
               {/* Add step-specific help text */}
               <div className="mt-6 text-center">
                 <span className="text-xs text-white/50">
-                  {currentStep === 0 && "Fill in the basic information to get started with your pool."}
-                  {currentStep === 1 && "Define who can participate in your pool and any restrictions."}
-                  {currentStep === 2 && "Add prizes that winners will receive. At least one prize is required."}
-                  {currentStep === 3 && "Configure additional settings to customize your pool experience."}
-                  {currentStep === 4 && "Review all details before creating your pool."}
+                  {currentStep === 0 && t('helpText.step1')}
+                  {currentStep === 1 && t('helpText.step2')}
+                  {currentStep === 2 && t('helpText.step3')}
+                  {currentStep === 3 && t('helpText.step4')}
+                  {currentStep === 4 && t('helpText.step5')}
                 </span>
               </div>
             </form>
@@ -388,41 +392,40 @@ export default function CreatePickMePage() {
             <div className="flex flex-col sm:flex-row items-start gap-4">
               <div className="bg-blue-500/20 p-3 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-white mb-2 flex items-center">
-                  About Pick Me Pools
+                  {t('infoCard.title')}
                   <span className="ml-2 text-xs bg-blue-500/30 text-blue-200 px-2 py-0.5 rounded-full">
-                    Quick Setup Guide
+                    {t('infoCard.quickGuide')}
                   </span>
                 </h3>
                 <p className="text-white/70 text-sm">
-                  Pick Me pools allow you to randomly select viewers from your audience. The selection process is fair and transparent.
-                  After creating a pool, your viewers can join during the entry period, and winners will be automatically selected when the period ends.
+                  {t('infoCard.description')}
                 </p>
                 
                 {/* Steps visualization to help users understand the flow */}
                 <div className="mt-4 flex items-center justify-between text-xs text-white/80 max-w-md">
                   <div className="flex flex-col items-center">
                     <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center mb-1">1</div>
-                    <span>Create Pool</span>
+                    <span>{t('infoCard.flowSteps.step1')}</span>
                   </div>
                   <div className="h-0.5 bg-blue-500/20 flex-1 mx-1"></div>
                   <div className="flex flex-col items-center">
                     <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center mb-1">2</div>
-                    <span>Share Link</span>
+                    <span>{t('infoCard.flowSteps.step2')}</span>
                   </div>
                   <div className="h-0.5 bg-blue-500/20 flex-1 mx-1"></div>
                   <div className="flex flex-col items-center">
                     <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center mb-1">3</div>
-                    <span>Entries Join</span>
+                    <span>{t('infoCard.flowSteps.step3')}</span>
                   </div>
                   <div className="h-0.5 bg-blue-500/20 flex-1 mx-1"></div>
                   <div className="flex flex-col items-center">
                     <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center mb-1">4</div>
-                    <span>Draw Winners</span>
+                    <span>{t('infoCard.flowSteps.step4')}</span>
                   </div>
                 </div>
                 
@@ -431,25 +434,25 @@ export default function CreatePickMePage() {
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
-                    Engagement Boost
+                    {t('infoCard.badges.engagementBoost')}
                   </div>
                   <div className="badge badge-success gap-1 transform hover:scale-105 transition-transform cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
-                    Fair Selection
+                    {t('infoCard.badges.fairSelection')}
                   </div>
                   <div className="badge badge-warning gap-1 transform hover:scale-105 transition-transform cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    Time-Based
+                    {t('infoCard.badges.timeBased')}
                   </div>
                   <div className="badge badge-secondary gap-1 transform hover:scale-105 transition-transform cursor-pointer">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Add Prizes
+                    {t('infoCard.badges.addPrizes')}
                   </div>
                 </div>
                 
@@ -462,11 +465,11 @@ export default function CreatePickMePage() {
                   </div>
                   <div>
                     <div className="flex items-center">
-                      <h4 className="font-medium text-blue-100">New: Subscriber-only Mode</h4>
-                      <span className="ml-2 bg-blue-500/40 text-blue-200 text-xs px-1.5 py-0.5 rounded-full">NEW</span>
+                      <h4 className="font-medium text-blue-100">{t('infoCard.newFeature.title')}</h4>
+                      <span className="ml-2 bg-blue-500/40 text-blue-200 text-xs px-1.5 py-0.5 rounded-full">{t('infoCard.newFeature.badge')}</span>
                     </div>
-                    <p className="text-xs text-blue-200/70">Create exclusive pools for your subscribers, boosting loyalty and channel growth!</p>
-                    <p className="text-xs text-blue-300 mt-1 underline underline-offset-2">Learn how to boost engagement with subscriber-only pools →</p>
+                    <p className="text-xs text-blue-200/70">{t('infoCard.newFeature.description')}</p>
+                    <p className="text-xs text-blue-300 mt-1 underline underline-offset-2">{t('infoCard.newFeature.learnMore')}</p>
                   </div>
                 </div>
               </div>
@@ -481,20 +484,20 @@ export default function CreatePickMePage() {
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              Prize Ideas
+              {t('prizeIdeas.title')}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
               <div className="bg-white/5 p-3 rounded-lg border border-purple-500/10 hover:border-purple-500/30 transition-all">
-                <h4 className="font-medium text-purple-300 mb-1">Digital Goodies</h4>
-                <p className="text-white/70">Game keys, subscription codes, digital art, etc.</p>
+                <h4 className="font-medium text-purple-300 mb-1">{t('prizeIdeas.categories.digital.title')}</h4>
+                <p className="text-white/70">{t('prizeIdeas.categories.digital.description')}</p>
               </div>
               <div className="bg-white/5 p-3 rounded-lg border border-purple-500/10 hover:border-purple-500/30 transition-all">
-                <h4 className="font-medium text-purple-300 mb-1">Community Perks</h4>
-                <p className="text-white/70">Special roles, custom emotes, shoutouts</p>
+                <h4 className="font-medium text-purple-300 mb-1">{t('prizeIdeas.categories.community.title')}</h4>
+                <p className="text-white/70">{t('prizeIdeas.categories.community.description')}</p>
               </div>
               <div className="bg-white/5 p-3 rounded-lg border border-purple-500/10 hover:border-purple-500/30 transition-all">
-                <h4 className="font-medium text-purple-300 mb-1">Experience</h4>
-                <p className="text-white/70">Play together, coaching session, private Q&A</p>
+                <h4 className="font-medium text-purple-300 mb-1">{t('prizeIdeas.categories.experience.title')}</h4>
+                <p className="text-white/70">{t('prizeIdeas.categories.experience.description')}</p>
               </div>
             </div>
           </div>
@@ -504,16 +507,16 @@ export default function CreatePickMePage() {
       {/* Add keyboard shortcut helper */}
       <div className="fixed bottom-4 right-4 text-xs text-white/50 bg-black/30 backdrop-blur-md rounded-lg px-3 py-2 border border-white/10">
         <div className="flex items-center gap-2">
-          <span>Keyboard shortcuts:</span>
+          <span>{t('keyboardShortcuts.title')}</span>
           <div className="flex items-center gap-1">
             <kbd className="bg-white/10 px-1.5 py-0.5 rounded">Tab</kbd>
-            <span>Next field</span>
+            <span>{t('keyboardShortcuts.nextField')}</span>
           </div>
           <div className="flex items-center gap-1">
             <kbd className="bg-white/10 px-1.5 py-0.5 rounded">Alt</kbd>
             <span>+</span>
             <kbd className="bg-white/10 px-1.5 py-0.5 rounded">N</kbd>
-            <span>Next step</span>
+            <span>{t('keyboardShortcuts.nextStep')}</span>
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { AuthService } from '../services/authService';
+import { AuthService } from '@/app/services/authService';
 import { setCookie, getCookie, deleteCookie } from 'cookies-next';
 
 // Type definitions
