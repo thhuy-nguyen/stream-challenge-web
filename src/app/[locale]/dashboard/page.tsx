@@ -41,7 +41,7 @@ export default function Dashboard() {
       
       try {
         const { data, error } = await supabase
-          .from('pools')
+          .from('pick_me_pools')
           .select('*')
           .eq('creator_id', user.id)
           .order('created_at', { ascending: false });
