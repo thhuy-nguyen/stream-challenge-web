@@ -4,13 +4,12 @@ import { useState, useEffect, FormEvent } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useAuth } from '@/utils/hooks/useAuth';
 import { useTranslations } from 'next-intl';
-import Link from 'next/link';
+import AppLayout from '@/app/components/AppLayout';
+import { CheckIcon } from '@/app/components/icons';
 
 type ProfileData = {
   id: string;
   username: string;
-  email: string;
-  avatar_url: string | null;
   bio: string | null;
   created_at: string;
 };
@@ -18,6 +17,7 @@ type ProfileData = {
 export default function ProfilePage() {
   const { user } = useAuth();
   const t = useTranslations('profile');
+  const navT = useTranslations('navigation');
   
   const [profileData, setProfileData] = useState<ProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +26,6 @@ export default function ProfilePage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
-  const [avatarUrl, setAvatarUrl] = useState('');
 
   const supabase = createClient();
 
@@ -36,27 +35,52 @@ export default function ProfilePage() {
       if (!user) return;
       
       try {
+        // Don't use .single() to avoid PGRST116 error
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', user.id)
-          .single();
+          .eq('id', user.id);
         
         if (error) throw error;
         
-        setProfileData(data);
-        setUsername(data.username || '');
-        setBio(data.bio || '');
-        setAvatarUrl(data.avatar_url || '');
+        // Check if a profile was found
+        if (data && data.length > 0) {
+          setProfileData(data[0]);
+          setUsername(data[0].username || '');
+          setBio(data[0].bio || '');
+        } else {
+          // If no profile exists, create one
+          console.log('No profile found, creating one...');
+          
+          const defaultUsername = user.email ? user.email.split('@')[0] : '';
+          
+          const { data: newProfile, error: insertError } = await supabase
+            .from('profiles')
+            .insert([{
+              id: user.id,
+              username: user.user_metadata?.username || defaultUsername,
+              // Don't include email in the profiles table as it's not in the schema
+            }])
+            .select();
+          
+          if (insertError) throw insertError;
+          
+          if (newProfile && newProfile.length > 0) {
+            setProfileData(newProfile[0]);
+            setUsername(newProfile[0].username || '');
+            setBio(newProfile[0].bio || '');
+          }
+        }
       } catch (err) {
-        console.error('Error fetching profile:', err);
+        console.error('Error fetching/creating profile:', err);
+        setError(err instanceof Error ? err.message : t('fetchError'));
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProfile();
-  }, [user, supabase]);
+  }, [user, supabase, t]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -67,13 +91,19 @@ export default function ProfilePage() {
     setError(null);
     setSuccess(null);
     
+    // Validate username is not empty
+    if (!username || username.trim() === '') {
+      setError(t('usernameRequired'));
+      setIsSaving(false);
+      return;
+    }
+    
     try {
       const { error } = await supabase
         .from('profiles')
         .update({
           username,
           bio,
-          avatar_url: avatarUrl,
           updated_at: new Date(),
         })
         .eq('id', user.id);
@@ -81,7 +111,12 @@ export default function ProfilePage() {
       if (error) throw error;
       
       setSuccess(t('profileUpdated'));
-    } catch (err: Error | unknown) {
+      
+      // Show success message for 3 seconds
+      setTimeout(() => {
+        setSuccess(null);
+      }, 3000);
+    } catch (err: unknown) {
       console.error('Error updating profile:', err);
       setError(err instanceof Error ? err.message : t('updateError'));
     } finally {
@@ -91,133 +126,112 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 flex items-center justify-center">
-        <div className="loading loading-spinner loading-lg text-purple-400"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
       </div>
     );
   }
 
+  // Define dashboard link for header
+  const headerLinks = [
+    { key: "dashboard", href: "/dashboard" },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900">
-      <header className="bg-white/10 backdrop-blur-md border-b border-white/10">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 text-white">
-                    <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <span className="ml-2 text-xl font-bold text-white">Stream Challenge</span>
+    <AppLayout 
+      headerLinks={headerLinks}
+      withGradientBackground={true}
+    >
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl font-bold mb-8 text-white">{t('yourProfile')}</h1>
+          
+          {/* Profile Card */}
+          <div className="space-y-6">
+            {/* Profile Info Card */}
+            <div className="card bg-white/10 backdrop-blur-md border border-white/10 shadow-xl">
+              <div className="card-body">
+                <h2 className="card-title text-white">{t('basicInfo')}</h2>
+                
+                {error && (
+                  <div className="alert alert-error">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                {success && (
+                  <div className="alert alert-success">
+                    <CheckIcon className="h-6 w-6 shrink-0 stroke-current" />
+                    <span>{success}</span>
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {user && (
+                    <div className="form-control w-full">
+                      <label className="label">
+                        <span className="label-text text-white">{t('email')}</span>
+                      </label>
+                      <input
+                        type="email"
+                        value={user.email || ''}
+                        disabled
+                        className="input input-bordered w-full bg-white/5 border-white/20"
+                      />
+                      <label className="label">
+                        <span className="label text-white/60 text-sm">{t('emailCannotBeChanged')}</span>
+                      </label>
+                    </div>
+                  )}
+                  
+                  <div className="form-control w-full">
+                    <label className="label">
+                      <span className="label-text text-white">{t('username')}</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="input input-bordered w-full bg-white/5 border-white/20"
+                      placeholder={t('usernamePlaceholder')}
+                    />
+                  </div>
+                  
+                  <div className="form-control w-full">
+                    <label className="label">
+                      <span className="label-text text-white">{t('bio')}</span>
+                    </label>
+                    <textarea
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      className="textarea textarea-bordered w-full bg-white/5 border-white/20 h-32"
+                      placeholder={t('bioPlaceholder')}
+                    ></textarea>
+                  </div>
+                  
+                  <div className="card-actions justify-end mt-6">
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={isSaving}
+                    >
+                      {isSaving ? (
+                        <>
+                          <span className="loading loading-spinner loading-sm"></span>
+                          {t('saving')}
+                        </>
+                      ) : t('saveChanges')}
+                    </button>
+                  </div>
+                </form>
               </div>
-              
-              <nav className="hidden md:flex space-x-6">
-                <Link href="/dashboard" className="text-white/70 hover:text-white transition">Dashboard</Link>
-                <Link href="/profile" className="text-white font-medium">Profile</Link>
-                <Link href="/settings" className="text-white/70 hover:text-white transition">Settings</Link>
-                <Link href="/help" className="text-white/70 hover:text-white transition">Help</Link>
-              </nav>
             </div>
-            
-            <button 
-              onClick={() => supabase.auth.signOut()}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto px-6 py-12">
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-white/10 backdrop-blur-md p-8 rounded-2xl border border-white/10 shadow-xl">
-            <div className="flex justify-between items-center mb-6">
-              <h1 className="text-2xl font-bold text-white">{t('yourProfile')}</h1>
-            </div>
-            
-            {error && (
-              <div className="alert alert-error mb-6">
-                <div>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{error}</span>
-                </div>
-              </div>
-            )}
-
-            {success && (
-              <div className="alert alert-success mb-6">
-                <div>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{success}</span>
-                </div>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {profileData && (
-                <div>
-                  <label className="block text-white mb-2">{t('email')}</label>
-                  <input
-                    type="email"
-                    value={profileData.email}
-                    disabled
-                    className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white/70"
-                  />
-                  <p className="text-white/50 text-sm mt-1">{t('emailCannotBeChanged')}</p>
-                </div>
-              )}
-              
-              <div>
-                <label className="block text-white mb-2">{t('username')}</label>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder={t('usernamePlaceholder')}
-                />
-              </div>
-              
-              <div>
-                <label className="block text-white mb-2">{t('bio')}</label>
-                <textarea
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent h-32"
-                  placeholder={t('bioPlaceholder')}
-                ></textarea>
-              </div>
-              
-              <div>
-                <label className="block text-white mb-2">{t('avatarUrl')}</label>
-                <input
-                  type="text"
-                  value={avatarUrl}
-                  onChange={(e) => setAvatarUrl(e.target.value)}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  placeholder={t('avatarUrlPlaceholder')}
-                />
-              </div>
-              
-              <div className="flex space-x-4">
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
-                  disabled={isSaving}
-                >
-                  {isSaving ? t('saving') : t('saveChanges')}
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }

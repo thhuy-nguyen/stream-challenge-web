@@ -23,7 +23,7 @@ export default function PickMeCreatePage() {
   const [formData, setFormData] = useState<PickMeFormData>({
     title: '',
     description: '',
-    entryDuration: 7, // Default: 7 days
+    entryDuration: 5, // Default: 5 minutes
     limitParticipants: false,
     maxParticipants: 100,
     subscribersOnly: false,
@@ -35,6 +35,7 @@ export default function PickMeCreatePage() {
     requireVerification: false
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   
   // Redirect if not logged in
   useEffect(() => {
@@ -43,17 +44,66 @@ export default function PickMeCreatePage() {
     }
   }, [isLoading, user, router]);
 
+  const validateStep = (currentStep: number): boolean => {
+    const errors: Record<string, boolean> = {};
+    
+    switch (currentStep) {
+      case 1: // Basic Info
+        if (!formData.title.trim()) {
+          errors.title = true;
+        }
+        break;
+      case 2: // Rules & Eligibility
+        if (formData.limitParticipants && (!formData.maxParticipants || formData.maxParticipants <= 0)) {
+          errors.maxParticipants = true;
+        }
+        break;
+      case 3: // Prizes
+        // Validation for prizes if needed
+        break;
+      case 4: // Advanced Settings
+        // Validation for advanced settings if needed
+        break;
+      case 5: // Review
+        // Final validation
+        if (!formData.title.trim()) {
+          errors.title = true;
+        }
+        break;
+      default:
+        break;
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleNextStep = () => {
-    setStep(prevStep => Math.min(prevStep + 1, 5));
+    if (validateStep(step)) {
+      setStep(prevStep => Math.min(prevStep + 1, 5));
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      // Highlight validation errors
+      // This will trigger UI updates in the respective step components
+    }
   };
 
   const handlePrevStep = () => {
     setStep(prevStep => Math.max(prevStep - 1, 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Function to update all form data
   const updateFormData = (data: Partial<PickMeFormData>) => {
     setFormData(prev => ({ ...prev, ...data }));
+    // Clear validation errors for updated fields
+    const updatedErrors = { ...validationErrors };
+    Object.keys(data).forEach(key => {
+      if (updatedErrors[key]) {
+        delete updatedErrors[key];
+      }
+    });
+    setValidationErrors(updatedErrors);
   };
   
   // Function specifically for updating prizes array
@@ -64,13 +114,17 @@ export default function PickMeCreatePage() {
   const handleSubmit = async () => {
     if (isSubmitting || !user) return;
     
+    if (!validateStep(5)) {
+      return; // Don't submit if final validation fails
+    }
+    
     setIsSubmitting(true);
     
     try {
-      // Calculate end time based on entry duration
+      // Calculate end time based on entry duration (in minutes)
       const now = new Date();
       const endTime = new Date(now);
-      endTime.setDate(now.getDate() + formData.entryDuration);
+      endTime.setMinutes(now.getMinutes() + formData.entryDuration);
       
       // Format data for the database
       const poolData = {
@@ -171,8 +225,8 @@ export default function PickMeCreatePage() {
           <div className="card-body p-6 md:p-8">
             <form onSubmit={(e) => e.preventDefault()}>
               <div>
-                {step === 1 && <BasicInfoStep formData={formData} updateForm={updateFormData} />}
-                {step === 2 && <RulesEligibilityStep formData={formData} updateForm={updateFormData} />}
+                {step === 1 && <BasicInfoStep formData={formData} updateForm={updateFormData} validationErrors={validationErrors} />}
+                {step === 2 && <RulesEligibilityStep formData={formData} updateForm={updateFormData} validationErrors={validationErrors} />}
                 {step === 3 && <PrizesStep formData={formData} updatePrizes={updatePrizes} />}
                 {step === 4 && <AdvancedSettingsStep formData={formData} updateForm={updateFormData} />}
                 {step === 5 && <ReviewStep formData={formData} isProcessing={isSubmitting} />}

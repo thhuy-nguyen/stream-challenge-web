@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
@@ -9,7 +9,6 @@ import { GoogleIcon } from '@/app/components/icons';
 
 export default function Register() {
   const t = useTranslations('auth.register');
-  // Removed unused commonT variable
   
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -20,8 +19,30 @@ export default function Register() {
   const [username, setUsername] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isTableChecked, setIsTableChecked] = useState(false);
 
   const supabase = createClient();
+
+  // Check if profiles table exists and create it if needed
+  useEffect(() => {
+    const checkAndCreateProfilesTable = async () => {
+      try {
+        // Try to query the profiles table to see if it exists
+        const { error } = await supabase.from('profiles').select('id').limit(1);
+        
+        // If the table doesn't exist, create it
+        if (error && error.message.includes('relation "public.profiles" does not exist')) {
+          await fetch('/api/migrations/profiles', { method: 'POST' });
+        }
+      } catch (err) {
+        console.error('Error checking profiles table:', err);
+      } finally {
+        setIsTableChecked(true);
+      }
+    };
+
+    checkAndCreateProfilesTable();
+  }, [supabase]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -49,21 +70,8 @@ export default function Register() {
       if (data?.user?.identities?.length === 0) {
         router.push('/auth/login?message=check-email');
       } else {
-        // Create user profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            { 
-              id: data.user?.id,
-              username,
-              email,
-            },
-          ]);
-        
-        if (profileError) {
-          throw profileError;
-        }
-        
+        // The profile should be created automatically by the database trigger
+        // No need to manually insert it anymore
         router.push(callbackUrl);
         router.refresh();
       }
@@ -94,6 +102,15 @@ export default function Register() {
       setIsLoading(false);
     }
   };
+
+  // Show loading state while checking for profiles table
+  if (!isTableChecked) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-800 to-violet-900 flex items-center justify-center">
+        <div className="loading loading-spinner loading-lg text-white"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-800 to-violet-900 flex items-center justify-center p-4">

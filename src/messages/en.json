@@ -13,6 +13,8 @@
     "logout": "Logout"
   },
   "common": {
+    "online": "Online",
+    "dashboard": "Dashboard",
     "features": "Features",
     "benefits": "Benefits",
     "howItWorks": "How It Works",
@@ -161,6 +163,7 @@
   "profile": {
     "title": "Your Profile",
     "yourProfile": "Your Profile",
+    "basicInfo": "Basic Information",
     "email": "Email",
     "emailCannotBeChanged": "Email address cannot be changed",
     "username": "Username",
@@ -178,9 +181,11 @@
     "cancel": "Cancel",
     "profileUpdated": "Profile updated successfully",
     "updateSuccess": "Profile updated successfully",
-    "updateError": "Could not update profile"
+    "updateError": "Could not update profile",
+    "usernameRequired": "Username cannot be empty"
   },
   "dashboard": {
+    "createNewPool": "Create New Pick Me",
     "appName": "Stream Challenge",
     "appTagline": "Engage with your audience",
     "online": "Online",
@@ -281,11 +286,11 @@
       "estimatedTime": "~2 minutes to complete",
       "backToDashboard": "Back to dashboard",
       "steps": {
-        "basicInfo": "Basic Info",
-        "rulesEligibility": "Rules & Eligibility",
-        "prizes": "Prizes",
-        "advancedSettings": "Advanced Settings",
-        "review": "Review"
+        "step1": "Basic Info",
+        "step2": "Rules & Eligibility",
+        "step3": "Prizes",
+        "step4": "Advanced Settings",
+        "step5": "Review"
       },
       "stepCompleted": "Completed",
       "stepInProgress": "In Progress",
@@ -352,6 +357,7 @@
         "poolName": "Pool Name",
         "poolNamePlaceholder": "Enter a name for your pool",
         "poolNameHelp": "Choose a clear name that reflects the purpose of this pool",
+        "poolNameRequired": "Pool name is required",
         "description": "Description (Optional)",
         "descriptionPlaceholder": "What is this pool for? What can participants expect?",
         "descriptionHelp": "A short description helps participants understand what they're entering",
@@ -382,7 +388,8 @@
           "title": "Limit Number of Participants",
           "description": "Limit the maximum number of people who can join this pool",
           "maxCount": "Maximum participant count",
-          "maxHelp": "When this limit is reached, no new entries will be accepted"
+          "maxHelp": "When this limit is reached, no new entries will be accepted",
+          "maxRequired": "Please enter a valid number greater than 0"
         },
         "subscribersOnly": {
           "title": "Subscribers Only",

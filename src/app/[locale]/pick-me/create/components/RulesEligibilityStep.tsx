@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PickMeFormData } from '../types';
 import { useTranslations } from 'next-intl';
 
 interface RulesEligibilityStepProps {
   formData: PickMeFormData;
   updateForm: (data: Partial<PickMeFormData>) => void;
+  validationErrors?: Record<string, boolean>;
 }
 
-const RulesEligibilityStep: React.FC<RulesEligibilityStepProps> = ({ formData, updateForm }) => {
+const RulesEligibilityStep: React.FC<RulesEligibilityStepProps> = ({ formData, updateForm, validationErrors = {} }) => {
   const t = useTranslations('pickMe.create.rulesEligibility');
+  
+  const [maxParticipantsTouched, setMaxParticipantsTouched] = useState<boolean>(false);
+  
+  // Mark fields as touched if there are validation errors
+  useEffect(() => {
+    if (validationErrors.maxParticipants) {
+      setMaxParticipantsTouched(true);
+    }
+  }, [validationErrors]);
   
   const handleToggleLimitParticipants = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateForm({ limitParticipants: e.target.checked });
@@ -16,11 +26,15 @@ const RulesEligibilityStep: React.FC<RulesEligibilityStepProps> = ({ formData, u
   
   const handleMaxParticipantsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateForm({ maxParticipants: parseInt(e.target.value) || 1 });
+    setMaxParticipantsTouched(true);
   };
   
   const handleToggleSubscribersOnly = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateForm({ subscribersOnly: e.target.checked });
   };
+  
+  const isMaxParticipantsValid = !formData.limitParticipants || (formData.maxParticipants && formData.maxParticipants > 0);
+  const showMaxParticipantsError = (maxParticipantsTouched || validationErrors.maxParticipants) && !isMaxParticipantsValid;
   
   return (
     <div className="space-y-6">
@@ -59,14 +73,20 @@ const RulesEligibilityStep: React.FC<RulesEligibilityStepProps> = ({ formData, u
             </label>
             <input 
               type="number" 
-              className="input input-bordered w-full max-w-xs bg-white/5 text-white focus:bg-white/10 mx-1"
+              className={`input input-bordered w-full max-w-xs bg-white/5 text-white focus:bg-white/10 mx-1 validator ${
+                showMaxParticipantsError ? 'input-error' : ''
+              }`}
               value={formData.maxParticipants}
               onChange={handleMaxParticipantsChange}
+              onBlur={() => setMaxParticipantsTouched(true)}
               min={1}
               max={10000}
             />
             <label className="label">
               <span className="label-text-alt text-white/60 whitespace-normal break-words break-words whitespace-normal">{t('limitParticipants.maxHelp')}</span>
+              {showMaxParticipantsError && (
+                <span className="validator-hint text-error">{t('limitParticipants.maxRequired')}</span>
+              )}
             </label>
           </div>
         )}

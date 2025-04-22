@@ -1,21 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PickMeFormData } from '../types';
 import { useTranslations } from 'next-intl';
 
 interface BasicInfoStepProps {
   formData: PickMeFormData;
   updateForm: (data: Partial<PickMeFormData>) => void;
+  validationErrors?: Record<string, boolean>;
 }
 
-const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formData, updateForm }) => {
+const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formData, updateForm, validationErrors = {} }) => {
   const t = useTranslations('pickMe.create.basicInfo');
   
   const [titleLength, setTitleLength] = useState<number>(formData.title.length);
   const [descriptionLength, setDescriptionLength] = useState<number>(formData.description?.length || 0);
+  const [titleTouched, setTitleTouched] = useState<boolean>(false);
+  
+  // Mark title as touched if there's a validation error
+  useEffect(() => {
+    if (validationErrors.title) {
+      setTitleTouched(true);
+    }
+  }, [validationErrors]);
   
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     updateForm({ title: e.target.value });
     setTitleLength(e.target.value.length);
+    setTitleTouched(true);
   };
   
   const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -27,26 +37,37 @@ const BasicInfoStep: React.FC<BasicInfoStepProps> = ({ formData, updateForm }) =
     updateForm({ entryDuration: parseInt(e.target.value) });
   };
   
+  const isTitleValid = formData.title.trim().length > 0;
+  const showTitleError = (titleTouched || validationErrors.title) && !isTitleValid;
+  
   return (
     <div className="space-y-6">
       <h3 className="text-xl font-semibold text-white mb-4">{t('title')}</h3>
       
       <div className="form-control w-full">
         <label className="label">
-          <span className="label-text text-white/80">{t('poolName')}</span>
+          <span className="label-text text-white/80">
+            {t('poolName')} <span className="text-error">*</span>
+          </span>
           <span className="label-text-alt text-white/60 whitespace-normal break-words">{titleLength}/60</span>
         </label>
         <input 
           type="text" 
           placeholder={t('poolNamePlaceholder')}
-          className="input input-bordered w-full bg-white/5 text-white placeholder:text-white/40 focus:bg-white/10"
+          className={`input input-bordered w-full bg-white/5 text-white placeholder:text-white/40 focus:bg-white/10 validator ${
+            showTitleError ? 'input-error' : ''
+          }`}
           value={formData.title}
           onChange={handleTitleChange}
+          onBlur={() => setTitleTouched(true)}
           maxLength={60}
           required
         />
         <label className="label">
           <span className="label-text-alt text-white/60 whitespace-normal break-words">{t('poolNameHelp')}</span>
+          {showTitleError && (
+            <span className="validator-hint text-error">{t('poolNameRequired')}</span>
+          )}
         </label>
       </div>
       

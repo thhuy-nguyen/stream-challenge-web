@@ -13,6 +13,8 @@
     "logout": "Đăng xuất"
   },
   "common": {
+    "online": "Trực tuyến",
+    "dashboard": "Bảng điều khiển",
     "features": "Tính năng",
     "benefits": "Lợi ích",
     "howItWorks": "Cách hoạt động",
@@ -159,8 +161,10 @@
     }
   },
   "profile": {
+    "usernameRequired": "Tên người dùng là bắt buộc",
     "title": "Hồ sơ của bạn",
     "yourProfile": "Hồ sơ của bạn",
+    "basicInfo": "Thông tin cơ bản",
     "email": "Email",
     "emailCannotBeChanged": "Địa chỉ email không thể thay đổi",
     "username": "Tên người dùng",
@@ -181,6 +185,7 @@
     "updateError": "Không thể cập nhật hồ sơ"
   },
   "dashboard": {
+    "createNewPool": "Tạo sự kiện mới",
     "appName": "Stream Challenge",
     "appTagline": "Tương tác với khán giả",
     "online": "Trực tuyến",
@@ -281,11 +286,11 @@
       "estimatedTime": "~2 phút để hoàn thành",
       "backToDashboard": "Quay lại bảng điều khiển",
       "steps": {
-        "basicInfo": "Thông tin cơ bản",
-        "rulesEligibility": "Quy tắc & Điều kiện",
-        "prizes": "Giải thưởng",
-        "advancedSettings": "Cài đặt nâng cao",
-        "review": "Xem lại"
+        "step1": "Thông tin cơ bản",
+        "step2": "Quy tắc & Điều kiện",
+        "step3": "Giải thưởng",
+        "step4": "Cài đặt nâng cao",
+        "step5": "Xem lại"
       },
       "stepCompleted": "Đã hoàn thành",
       "stepInProgress": "Đang thực hiện",
@@ -352,6 +357,7 @@
         "poolName": "Tên sự kiện",
         "poolNamePlaceholder": "Nhập tên cho sự kiện của bạn",
         "poolNameHelp": "Chọn tên rõ ràng thể hiện mục đích của đợt rút thăm này",
+        "poolNameRequired": "Tên sự kiện là bắt buộc",
         "description": "Mô tả (Tùy chọn)",
         "descriptionPlaceholder": "Sự kiện này dùng để làm gì? Người tham gia có thể mong đợi điều gì?",
         "descriptionHelp": "Mô tả ngắn giúp người tham gia hiểu họ đang tham gia vào điều gì",
@@ -382,7 +388,8 @@
           "title": "Giới hạn số người tham gia",
           "description": "Giới hạn số lượng tối đa người có thể tham gia sự kiện này",
           "maxCount": "Số người tham gia tối đa",
-          "maxHelp": "Khi đạt đến giới hạn này, không có đăng ký mới nào được chấp nhận"
+          "maxHelp": "Khi đạt đến giới hạn này, không có đăng ký mới nào được chấp nhận",
+          "maxRequired": "Vui lòng nhập một số hợp lệ lớn hơn 0"
         },
         "subscribersOnly": {
           "title": "Chỉ người đăng ký",

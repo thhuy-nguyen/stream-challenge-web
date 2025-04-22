@@ -1,9 +1,12 @@
 "use client"
 
-import Link from "next/link";  // Changed from next-intl
-import { ReactNode } from "react";
+import Link from "next/link";
+import { ReactNode, useEffect, useState } from "react";
 import { useTranslations } from 'next-intl';
 import LanguageSwitcher from "./LanguageSwitcher";
+import { useAuth } from '@/utils/hooks/useAuth';
+import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
 
 type AppLayoutProps = {
   children: ReactNode;
@@ -12,7 +15,7 @@ type AppLayoutProps = {
   pageTitle?: string;
   pageDescription?: string;
   withGradientBackground?: boolean;
-  headerLinks?: { key: string; href: string }[];  // Changed from name to key for translation
+  headerLinks?: { key: string; href: string }[];
 };
 
 export default function AppLayout({
@@ -32,6 +35,19 @@ export default function AppLayout({
   const commonT = useTranslations('common');
   const navT = useTranslations('navigation');
   const footerT = useTranslations('footer');
+  
+  // Get authentication state
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
+  const supabase = createClient();
+  
+  // State for mobile menu
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/auth/login');
+  };
 
   return (
     <div className={`min-h-screen ${withGradientBackground ? 'bg-gradient-to-br from-purple-900 via-indigo-800 to-violet-900 text-white' : 'bg-base-100'}`}>
@@ -52,6 +68,19 @@ export default function AppLayout({
                 <span className={`text-lg font-bold ${withGradientBackground ? 'text-white' : 'text-gray-800'}`}>{t('app.name')}</span>
               </Link>
 
+              {/* Mobile menu button */}
+              <div className="md:hidden">
+                <button 
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className={`p-2 rounded-lg ${withGradientBackground ? 'text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Desktop Navigation */}
               <div className="hidden md:flex items-center space-x-8">
                 {headerLinks.map((link) => (
                   <Link 
@@ -67,23 +96,141 @@ export default function AppLayout({
                 ))}
               </div>
 
-              <div className="flex items-center space-x-4">
+              <div className="hidden md:flex items-center space-x-4">
                 <LanguageSwitcher isDarkMode={withGradientBackground} />
-                <Link 
-                  href="/auth/login" 
-                  className={`px-4 py-2 rounded-lg border ${withGradientBackground 
-                    ? "bg-indigo-700 hover:bg-indigo-600 text-white border-indigo-500" 
-                    : "bg-indigo-100 hover:bg-indigo-200 text-indigo-800 border-indigo-200"
-                  }`}
-                >
-                  {navT('login')}
-                </Link>
-                <Link href="/auth/register" className="whitespace-nowrap px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-purple-500/30 transition-all duration-300">
-                  {navT('signup')}
-                </Link>
+                
+                {!isLoading && !user ? (
+                  <>
+                    <Link 
+                      href="/auth/login" 
+                      className={`px-4 py-2 rounded-lg border ${withGradientBackground 
+                        ? "bg-indigo-700 hover:bg-indigo-600 text-white border-indigo-500" 
+                        : "bg-indigo-100 hover:bg-indigo-200 text-indigo-800 border-indigo-200"
+                      }`}
+                    >
+                      {navT('login')}
+                    </Link>
+                    <Link href="/auth/register" className="whitespace-nowrap px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-lg shadow-lg hover:shadow-purple-500/30 transition-all duration-300">
+                      {navT('signup')}
+                    </Link>
+                  </>
+                ) : !isLoading && user ? (
+                  <div className="dropdown dropdown-end">
+                    <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar online">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 ring ring-purple-500/30 ring-offset-base-100 ring-offset-1 flex items-center justify-center text-white font-bold">
+                        <span className="inline-flex items-center justify-center w-full h-full">
+                          {user?.user_metadata?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    </div>
+                    <ul tabIndex={0} className={`menu dropdown-content mt-3 z-[1] p-2 shadow-lg rounded-box w-52 ${withGradientBackground ? 'bg-gradient-to-br from-indigo-900 to-purple-900' : 'bg-white'}`}>
+                      <li className="mb-2 disabled">
+                        <a className={`font-medium ${withGradientBackground ? 'text-white' : 'text-gray-800'}`}>
+                          <div className="flex flex-col items-start">
+                            <span>{user?.user_metadata?.display_name || user?.email?.split('@')[0]}</span>
+                            <span className="text-xs text-green-400">{commonT('online')}</span>
+                          </div>
+                        </a>
+                      </li>
+                      <div className={`divider my-0 h-px ${withGradientBackground ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+                      <li><Link href="/dashboard" className={withGradientBackground ? 'text-white/90' : 'text-gray-700'}>{navT('dashboard')}</Link></li>
+                      <li><Link href="/profile" className={withGradientBackground ? 'text-white/90' : 'text-gray-700'}>{navT('profile')}</Link></li>
+                      <div className={`divider my-0 h-px ${withGradientBackground ? 'bg-white/10' : 'bg-gray-200'}`}></div>
+                      <li>
+                        <button onClick={handleLogout} className="text-red-400 w-full text-left">
+                          {navT('logout')}
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
+          
+          {/* Mobile menu */}
+          {mobileMenuOpen && (
+            <div className={`md:hidden py-4 px-6 ${withGradientBackground ? 'bg-black/20 backdrop-blur-md' : 'bg-white'}`}>
+              <nav className="flex flex-col space-y-3">
+                {headerLinks.map((link) => (
+                  <Link 
+                    key={link.key} 
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={withGradientBackground 
+                      ? "text-white/80 hover:text-white py-2 transition-colors" 
+                      : "text-gray-600 hover:text-gray-900 py-2 transition-colors"
+                    }
+                  >
+                    {commonT(link.key)}
+                  </Link>
+                ))}
+                
+                {!isLoading && !user ? (
+                  <div className="pt-4 flex flex-col space-y-3">
+                    <Link 
+                      href="/auth/login" 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`px-4 py-2 rounded-lg border text-center ${withGradientBackground 
+                        ? "bg-indigo-700 hover:bg-indigo-600 text-white border-indigo-500" 
+                        : "bg-indigo-100 hover:bg-indigo-200 text-indigo-800 border-indigo-200"
+                      }`}
+                    >
+                      {navT('login')}
+                    </Link>
+                    <Link 
+                      href="/auth/register" 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="whitespace-nowrap px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white rounded-lg shadow-lg text-center transition-all duration-300"
+                    >
+                      {navT('signup')}
+                    </Link>
+                  </div>
+                ) : !isLoading && user ? (
+                  <div className="pt-4 border-t border-gray-200 flex flex-col space-y-3">
+                    <div className="flex items-center mb-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center text-white font-bold mr-2">
+                        {user?.user_metadata?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className={withGradientBackground ? 'text-white' : 'text-gray-800'}>
+                          {user?.user_metadata?.display_name || user?.email?.split('@')[0]}
+                        </span>
+                        <span className="text-xs text-green-400">{commonT('online')}</span>
+                      </div>
+                    </div>
+                    <Link 
+                      href="/dashboard" 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={withGradientBackground ? 'text-white/90 py-2' : 'text-gray-700 py-2'}
+                    >
+                      {navT('dashboard')}
+                    </Link>
+                    <Link 
+                      href="/profile" 
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={withGradientBackground ? 'text-white/90 py-2' : 'text-gray-700 py-2'}
+                    >
+                      {navT('profile')}
+                    </Link>
+                    <button 
+                      onClick={() => {
+                        handleLogout();
+                        setMobileMenuOpen(false);
+                      }} 
+                      className="text-red-400 py-2 text-left"
+                    >
+                      {navT('logout')}
+                    </button>
+                  </div>
+                ) : null}
+                
+                <div className="pt-4 flex justify-center">
+                  <LanguageSwitcher isDarkMode={withGradientBackground} />
+                </div>
+              </nav>
+            </div>
+          )}
         </header>
       )}
 
