@@ -1,7 +1,7 @@
 'use client';
 
 import { createClient } from '@/utils/supabase/client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useToast } from '@/utils/hooks/useToast';
 import React from 'react';
@@ -59,66 +59,89 @@ export default function PoolDetailPage() {
   const [prizes, setPrizes] = useState<Prize[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [isJoining, setIsJoining] = useState(false);
-  const [hasJoined, setHasJoined] = useState(false);
+  const [timeRemainingSeconds, setTimeRemainingSeconds] = useState(0);
 
   const { showToast } = useToast();
 
-  const getTimeRemaining = useCallback(() => {
-    if (!pool || pool.status !== 'active') return null;
+  // Calculate remaining time in seconds
+  const calculateTimeRemaining = (endTime: string): number => {
+    const now = new Date();
+    const end = new Date(endTime);
+    const diffInSeconds = Math.floor((end.getTime() - now.getTime()) / 1000);
 
-    const endTime = new Date(pool.endTime).getTime();
-    const now = new Date().getTime();
-    const diff = endTime - now;
-
-    if (diff <= 0) return { minutes: 0, seconds: 0 };
-
-    const minutes = Math.floor(diff / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-    return { minutes, seconds };
-  }, [pool]);
-
-  const [timeRemaining, setTimeRemaining] = useState(getTimeRemaining());
-
-  const checkUserJoinStatus = async (participants: Participant[]) => {
-    try {
-      const supabase = createClient();
-      const { data: { user }, error } = await supabase.auth.getUser();
-      
-      if (error || !user) {
-        console.error('Error getting user or user not authenticated:', error);
-        return false;
-      }
-      const currentUserId = user.id;
-      
-      const isParticipant = participants.some(participant => 
-        participant.userId === currentUserId
-      );
-      setHasJoined(isParticipant);
-      return isParticipant;
-    } catch (error) {
-      console.error('Error checking join status:', error);
-      return false;
-    }
+    // If end time has passed, return 0
+    return diffInSeconds > 0 ? diffInSeconds : 0;
   };
 
+  // Update time remaining every second
+  useEffect(() => {
+    if (!pool || pool.status !== 'active') return;
+
+    const timer = setInterval(() => {
+      setTimeRemainingSeconds(prev => {
+        if (prev > 0) {
+          return prev - 1;
+        }
+        return 0;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [pool]);
+
+  // Fetch pool data
+  useEffect(() => {
+    async function fetchPoolDetails() {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/pick-me/pools/${poolId}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch pool details');
+        }
+
+        const data = await response.json();
+        setPool(data.pool);
+        setParticipants(data.participants || []);
+        setPrizes(data.prizes || []);
+
+        // Calculate initial time remaining if pool is active
+        if (data.pool.status === 'active') {
+          setTimeRemainingSeconds(calculateTimeRemaining(data.pool.endTime));
+        }
+
+        // Fetch winners if pool is completed
+        if (data.pool.status === 'completed') {
+          const winnersResponse = await fetch(`/api/pick-me/pools/${poolId}/draw`);
+          if (winnersResponse.ok) {
+            const winnersData = await winnersResponse.json();
+            setWinners({
+              primaryWinners: winnersData.primaryWinners || [],
+              backupWinners: winnersData.backupWinners || []
+            });
+          }
+        }
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+        setError(errorMessage);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    fetchPoolDetails();
+  }, [poolId]);
+
+  // Handle copy share URL
   const handleCopyShareUrl = () => {
     const shareUrl = window.location.href;
     navigator.clipboard.writeText(shareUrl).then(
       () => {
-        setCopied(true);
         showToast({
           title: "URL Copied!",
           message: "Pool URL has been copied to your clipboard",
           variant: "success"
         });
-        
-        setTimeout(() => {
-          setCopied(false);
-        }, 2000);
       },
       (err) => {
         console.error('Could not copy text: ', err);
@@ -129,157 +152,6 @@ export default function PoolDetailPage() {
         });
       }
     );
-  };
-
-  const fetchWinners = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/pick-me/pools/${poolId}/draw`);
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch winners');
-      }
-
-      const data = await response.json();
-      setWinners({
-        primaryWinners: data.primaryWinners || [],
-        backupWinners: data.backupWinners || []
-      });
-    } catch (err: unknown) {
-      console.error('Error fetching winners:', err);
-    }
-  }, [poolId]);
-
-  useEffect(() => {
-    const fetchPoolDetails = async () => {
-      try {
-        const response = await fetch(`/api/pick-me/pools/${poolId}`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch pool details');
-        }
-        
-        const data = await response.json();
-        setPool(data.pool);
-        setParticipants(data.participants || []);
-        setPrizes(data.prizes || []);
-        
-        if (data.pool.status === 'completed') {
-          fetchWinners();
-        }
-        await checkUserJoinStatus(data.participants);
-      } catch (err: unknown) {
-        const error = err instanceof Error ? err.message : 'An error occurred';
-        setError(error as string);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchPoolDetails();
-    
-    const timer = setInterval(() => {
-      const remaining = getTimeRemaining();
-      setTimeRemaining(remaining);
-      
-      if (remaining && remaining.minutes === 0 && remaining.seconds === 0) {
-        fetchPoolDetails();
-      }
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, [poolId, fetchWinners, getTimeRemaining]);
-
-  const handleDrawWinners = async () => {
-    if (!confirm('Are you sure you want to draw winners now? This action cannot be undone.')) {
-      return;
-    }
-
-    setIsDrawing(true);
-
-    try {
-      const response = await fetch(`/api/pick-me/pools/${poolId}/draw`, {
-        method: 'POST',
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to draw winners');
-      }
-
-      const data = await response.json();
-
-      setWinners({
-        primaryWinners: data.primaryWinners || [],
-        backupWinners: data.backupWinners || []
-      });
-
-      setPool(prev => prev ? { ...prev, status: 'completed' } : null);
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred while drawing winners';
-      setError(errorMessage);
-    } finally {
-      setIsDrawing(false);
-    }
-  };
-
-  useEffect(() => {
-    if (participants.length > 0) {
-      setHasJoined(false);
-    }
-  }, [participants]);
-
-  const handleJoinPool = async () => {
-    if (hasJoined) {
-      showToast({
-        title: "Already Joined",
-        message: "You are already a participant in this pool.",
-        variant: "info"
-      });
-      return;
-    }
-    
-    setIsJoining(true);
-    
-    try {
-      const response = await fetch(`/api/pick-me/pools/${poolId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        if (data.alreadyJoined) {
-          setHasJoined(true);
-          showToast({
-            title: "Already Joined",
-            message: "You are already a participant in this pool.",
-            variant: "info"
-          });
-        } else {
-          throw new Error(data.message || 'Failed to join the pool');
-        }
-      } else {
-        setParticipants(prev => [...prev, data.participant]);
-        setHasJoined(true);
-        showToast({
-          title: "Successfully Joined!",
-          message: "You have been added to the pool. Good luck!",
-          variant: "success"
-        });
-      }
-    } catch (err: unknown) {
-      const error = err instanceof Error ? err.message : 'An error occurred while joining the pool';
-      showToast({
-        title: "Error",
-        message: error,
-        variant: "error"
-      });
-    } finally {
-      setIsJoining(false);
-    }
   };
 
   if (isLoading) {
@@ -313,6 +185,10 @@ export default function PoolDetailPage() {
       </div>
     );
   }
+
+  // Convert seconds to minutes and seconds for display
+  const displayMinutes = Math.floor(timeRemainingSeconds / 60);
+  const displaySeconds = timeRemainingSeconds % 60;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-indigo-950 to-purple-900 py-12">
@@ -359,51 +235,13 @@ export default function PoolDetailPage() {
                       className="absolute right-2 top-1/2 transform -translate-y-1/2 text-indigo-300 hover:text-indigo-100 transition-colors"
                       aria-label="Copy share URL"
                     >
-                      {copied ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                          <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                        </svg>
-                      )}
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                        <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                      </svg>
                     </button>
                   </div>
                 </div>
-                
-                {/* Join button for non-creators */}
-                {pool.status === 'active' && !pool.isCreator && (
-                  <div className="mt-4">
-                    <button 
-                      className={`btn ${hasJoined ? 'btn-success' : 'btn-primary'} gap-2`}
-                      onClick={handleJoinPool}
-                      disabled={isJoining || hasJoined}
-                    >
-                      {isJoining ? (
-                        <>
-                          <span className="loading loading-spinner loading-xs"></span>
-                          Joining...
-                        </>
-                      ) : hasJoined ? (
-                        <>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                          </svg>
-                          Joined
-                        </>
-                      ) : (
-                        <>
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clipRule="evenodd" />
-                          </svg>
-                          Join Pool
-                        </>
-                      )}
-                    </button>
-                  </div>
-                )}
                 
                 <div className="mt-6 grid grid-cols-2 gap-4">
                   <div>
@@ -445,42 +283,45 @@ export default function PoolDetailPage() {
                 </div>
               </div>
               
-              {/* Timer or Status Display */}
+              {/* Status Display */}
               <div className="mt-6 md:mt-0 md:ml-6 flex-shrink-0">
-                {pool.status === 'active' && timeRemaining && (
-                  <div className="text-center">
-                    <h3 className="text-lg font-medium text-white mb-2">Time Remaining</h3>
-                    <div className="grid grid-flow-col gap-5 text-center auto-cols-max">
-                      <div className="flex flex-col p-2 bg-indigo-800/50 rounded-box text-white">
-                        <span className="countdown font-mono text-4xl">
-                          <span style={{ "--value": timeRemaining.minutes } as React.CSSProperties}></span>
-                        </span>
-                        min
-                      </div> 
-                      <div className="flex flex-col p-2 bg-indigo-800/50 rounded-box text-white">
-                        <span className="countdown font-mono text-4xl">
-                          <span style={{ "--value": timeRemaining.seconds } as React.CSSProperties}></span>
-                        </span>
-                        sec
-                      </div>
+                {pool.status === 'active' && (
+                  <div className="bg-indigo-900/20 rounded-xl p-4 text-center border border-indigo-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-indigo-400 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <h3 className="text-lg font-medium text-white">Active Pool</h3>
+                    <div className="text-indigo-300 text-sm mt-1">
+                      <p>Ends: {new Date(pool.endTime).toLocaleString()}</p>
+                      
+                      {timeRemainingSeconds > 0 ? (
+                        <div className="mt-3">
+                          <p className="text-white/70 mb-1">Time remaining:</p>
+                          <div className="flex justify-center gap-2">
+                            <div className="flex flex-col">
+                              <div className="bg-indigo-800/50 text-yellow-300 font-mono font-bold text-xl rounded-md px-3 py-1 min-w-[3rem]">
+                                {displayMinutes.toString().padStart(2, '0')}
+                              </div>
+                              <span className="text-xs text-indigo-300 mt-1">min</span>
+                            </div>
+                            <div className="text-yellow-300 font-bold text-2xl self-center pb-1">:</div>
+                            <div className="flex flex-col">
+                              <div className="bg-indigo-800/50 text-yellow-300 font-mono font-bold text-xl rounded-md px-3 py-1 min-w-[3rem]">
+                                {displaySeconds.toString().padStart(2, '0')}
+                              </div>
+                              <span className="text-xs text-indigo-300 mt-1">sec</span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-2 badge badge-warning gap-1">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                          Ending soon...
+                        </div>
+                      )}
                     </div>
-                    
-                    {pool.isCreator && (
-                      <div className="mt-6">
-                        <button 
-                          className="btn btn-primary btn-sm" 
-                          onClick={handleDrawWinners}
-                          disabled={isDrawing}
-                        >
-                          {isDrawing ? (
-                            <>
-                              <span className="loading loading-spinner loading-xs"></span>
-                              Drawing...
-                            </>
-                          ) : 'Draw Winners Now'}
-                        </button>
-                      </div>
-                    )}
                   </div>
                 )}
                 
@@ -664,45 +505,43 @@ export default function PoolDetailPage() {
         )}
         
         {/* Participants List */}
-        {pool.status === 'active' && (
-          <div className="card bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl mt-8">
-            <div className="card-body p-8">
-              <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                </svg>
-                Participants ({participants.length})
-              </h3>
-              
-              {participants.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="table table-zebra bg-transparent w-full">
-                    <thead>
-                      <tr className="text-indigo-300 border-indigo-800/50">
-                        <th>User ID</th>
-                        <th>Display Name</th>
-                        <th>Joined At</th>
+        <div className="card bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl mt-8">
+          <div className="card-body p-8">
+            <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+              </svg>
+              Participants ({participants.length})
+            </h3>
+            
+            {participants.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="table table-zebra bg-transparent w-full">
+                  <thead>
+                    <tr className="text-indigo-300 border-indigo-800/50">
+                      <th>User ID</th>
+                      <th>Display Name</th>
+                      <th>Joined At</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {participants.map((participant) => (
+                      <tr key={participant.id} className="text-white border-indigo-800/30 bg-transparent hover:bg-white/5">
+                        <td>{participant.userId}</td>
+                        <td>{participant.displayName}</td>
+                        <td>{new Date(participant.joinedAt).toLocaleString()}</td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {participants.map((participant) => (
-                        <tr key={participant.id} className="text-white border-indigo-800/30 bg-transparent hover:bg-white/5">
-                          <td>{participant.userId}</td>
-                          <td>{participant.displayName}</td>
-                          <td>{new Date(participant.joinedAt).toLocaleString()}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <p className="text-white/70">No participants have joined yet</p>
-                </div>
-              )}
-            </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-white/70">No participants have joined yet</p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
