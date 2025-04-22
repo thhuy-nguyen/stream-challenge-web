@@ -132,30 +132,30 @@ export default function AppLayout({
               <div>
                 <h3 className="text-lg font-semibold mb-6">{footerT('product')}</h3>
                 <ul className="space-y-4">
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('features')}</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('pricing')}</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('documentation')}</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('integrations')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('features')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('pricing')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('security')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('developers')}</Link></li>
                 </ul>
               </div>
 
               <div>
                 <h3 className="text-lg font-semibold mb-6">{footerT('company')}</h3>
                 <ul className="space-y-4">
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('aboutUs')}</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('contact')}</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('blog')}</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('careers')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('aboutUs')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('contact')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('blog')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('careers')}</Link></li>
                 </ul>
               </div>
 
               <div>
                 <h3 className="text-lg font-semibold mb-6">{footerT('legal')}</h3>
                 <ul className="space-y-4">
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('termsOfService')}</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('privacyPolicy')}</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('cookiePolicy')}</Link></li>
-                  <li><Link href="#" className="text-gray-400 hover:text-white transition-colors">{footerT('gdpr')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('privacyPolicy')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('termsOfService')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('cookiePolicy')}</Link></li>
+                  <li><Link href="#" className="text-gray-300 hover:text-white transition-colors">{footerT('gdpr')}</Link></li>
                 </ul>
               </div>
             </div>
@@ -163,10 +163,10 @@ export default function AppLayout({
 
           <div className="border-t border-gray-800">
             <div className="container mx-auto py-6 px-6 flex flex-col md:flex-row justify-between items-center">
-              <div className="text-gray-400 text-sm mb-4 md:mb-0">
+              <div className="text-gray-300 text-sm mb-4 md:mb-0">
                 {footerT('copyright')}
               </div>
-              <div className="flex space-x-4 text-sm text-gray-400">
+              <div className="flex space-x-4 text-sm text-gray-300">
                 <Link href="#" className="hover:text-white transition-colors">{footerT('status')}</Link>
                 <span>•</span>
                 <Link href="#" className="hover:text-white transition-colors">{footerT('sitemap')}</Link>

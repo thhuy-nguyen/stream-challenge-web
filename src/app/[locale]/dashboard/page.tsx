@@ -90,9 +90,9 @@ export default function Dashboard() {
                 </div>
                 <ul tabIndex={0} className="menu dropdown-content mt-3 z-[1] p-2 shadow-lg bg-gradient-to-br from-indigo-900 to-purple-900 rounded-box w-52">
                   <li><Link href="/dashboard" className="text-white font-medium">{navT('dashboard')}</Link></li>
-                  <li><Link href="/profile" className="text-white/90">{navT('profile')}</Link></li>
-                  <li><Link href="/settings" className="text-white/90">{navT('settings')}</Link></li>
-                  <li><Link href="/help" className="text-white/90">{navT('help')}</Link></li>
+                  <li><Link href="/profile" className="text-white">{navT('profile')}</Link></li>
+                  <li><Link href="/settings" className="text-white">{navT('settings')}</Link></li>
+                  <li><Link href="/help" className="text-white">{navT('help')}</Link></li>
                 </ul>
               </div>
               
@@ -111,9 +111,9 @@ export default function Dashboard() {
               <div className="hidden lg:flex ml-10">
                 <div className="tabs tabs-boxed bg-white/5 p-1 rounded-xl">
                   <Link href="/dashboard" className="tab tab-md text-white font-medium tab-active bg-white/10">{navT('dashboard')}</Link>
-                  <Link href="/profile" className="tab tab-md text-white/70 hover:text-white">{navT('profile')}</Link>
-                  <Link href="/settings" className="tab tab-md text-white/70 hover:text-white">{navT('settings')}</Link>
-                  <Link href="/help" className="tab tab-md text-white/70 hover:text-white">{navT('help')}</Link>
+                  <Link href="/profile" className="tab tab-md text-white hover:text-white">{navT('profile')}</Link>
+                  <Link href="/settings" className="tab tab-md text-white hover:text-white">{navT('settings')}</Link>
+                  <Link href="/help" className="tab tab-md text-white hover:text-white">{navT('help')}</Link>
                 </div>
               </div>
             </div>

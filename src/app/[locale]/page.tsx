@@ -72,7 +72,7 @@ export default function Home() {
                 </button>
                 <button 
                   onClick={() => setShowVideo(!showVideo)} 
-                  className="btn bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white btn-lg transition-all duration-300"
+                  className="btn bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 text-white btn-lg transition-all duration-300 shadow-md"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 mr-2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -86,8 +86,8 @@ export default function Home() {
             {/* Video placeholder - Hidden by default, will appear on the right when button is clicked */}
             <div className={`mt-12 md:mt-0 transform transition-all duration-1000 w-full ${showVideo ? "md:w-1/2 opacity-100 translate-y-0" : "md:w-0 opacity-0 md:translate-y-8"}`}>
               {showVideo && (
-              <div className="relative bg-black/40 backdrop-blur-sm p-2 rounded-2xl shadow-2xl overflow-hidden border border-white/10 group">
-                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg blur-lg opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+              <div className="relative bg-black/60 backdrop-blur-sm p-3 rounded-2xl shadow-2xl overflow-hidden border border-white/20 group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg blur-lg opacity-40 group-hover:opacity-60 transition duration-1000"></div>
                 <div className="relative aspect-video w-full overflow-hidden rounded-xl">
                   {showVideo && (
                     <iframe 
