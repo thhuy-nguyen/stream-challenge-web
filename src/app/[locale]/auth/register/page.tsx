@@ -5,7 +5,15 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from 'next-intl';
-import { GoogleIcon } from '@/app/components/icons';
+import { 
+  GoogleIcon, 
+  TwitchIcon, 
+  EmailIcon, 
+  LockIcon,
+  WarningIcon,
+  UserPlusIcon,
+  UserIcon
+} from '@/app/components/icons';
 
 export default function Register() {
   const t = useTranslations('auth.register');
@@ -127,9 +135,7 @@ export default function Register() {
             {/* Logo and Title */}
             <div className="flex flex-col items-center mb-6">
               <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-white">
-                  <path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z" />
-                </svg>
+                <UserPlusIcon className="w-8 h-8 text-white" />
               </div>
               <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200">{t('title')}</h1>
               <p className="text-white/80 mt-2">{t('subtitle')}</p>
@@ -138,9 +144,7 @@ export default function Register() {
             {/* Error Message */}
             {error && (
               <div className="alert alert-error mb-6 bg-opacity-20 backdrop-blur-md border-red-500/40">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <WarningIcon className="h-6 w-6 shrink-0 stroke-current" />
                 <span>{error}</span>
               </div>
             )}
@@ -153,10 +157,7 @@ export default function Register() {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-300" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                    </svg>
+                    <EmailIcon className="h-5 w-5 text-purple-300" />
                   </div>
                   <input
                     id="email"
@@ -176,9 +177,7 @@ export default function Register() {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-300" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
+                    <UserIcon className="h-5 w-5 text-purple-300" />
                   </div>
                   <input
                     id="username"

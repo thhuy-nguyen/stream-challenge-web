@@ -7,6 +7,7 @@ import { useAuth } from '@/utils/hooks/useAuth';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
 import AppLayout from '@/app/components/AppLayout';
+import { PlusIcon, CubeIcon, MailboxIcon } from '@/app/components/icons';
 
 // Define interface for pool items
 interface Pool {
@@ -97,9 +98,7 @@ export default function Dashboard() {
                 
                 <div className="mt-4 md:mt-0">
                   <Link href="/pick-me/create" className="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                    </svg>
+                    <PlusIcon className="h-5 w-5 mr-2" />
                     {t('createNewPool')}
                   </Link>
                 </div>
@@ -112,15 +111,11 @@ export default function Dashboard() {
             <div className="card-body">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="card-title text-white/90 flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M11 17a1 1 0 001.447.894l4-2A1 1 0 0017 15V9.236a1 1 0 00-1.447-.894l-4 2a1 1 0 00-.553.894V17zM15.211 6.276a1 1 0 000-1.788l-4.764-2.382a1 1 0 00-.894 0L4.789 4.488a1 1 0 000 1.788l4.764 2.382a1 1 0 00.894 0l4.764-2.382zM4.447 8.342A1 1 0 003 9.236V15a1 1 0 00.553.894l4 2A1 1 0 009 17v-5.764a1 1 0 00-.553-.894l-4-2z" />
-                  </svg>
+                  <CubeIcon className="h-5 w-5 mr-2 text-blue-400" />
                   {t('myPools.title')}
                 </h3>
                 <Link href="/pick-me/create" className="btn btn-primary btn-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                  </svg>
+                  <PlusIcon className="h-4 w-4 mr-1" />
                   {t('myPools.createNew')}
                 </Link>
               </div>
@@ -171,9 +166,7 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-indigo-500/50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                  </svg>
+                  <MailboxIcon className="h-12 w-12 mx-auto text-indigo-500/50" />
                   <p className="mt-4 text-white/70">{t('myPools.noPools')}</p>
                   <Link href="/pick-me/create" className="btn btn-primary mt-4">
                     {t('myPools.createFirst')}

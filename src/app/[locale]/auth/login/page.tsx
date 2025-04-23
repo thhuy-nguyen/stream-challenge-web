@@ -5,7 +5,14 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from 'next-intl';
-import { GoogleIcon } from '@/app/components/icons';
+import { 
+  GoogleIcon, 
+  TwitchIcon, 
+  EmailIcon, 
+  LockIcon,
+  WarningIcon,
+  PlayIcon
+} from '@/app/components/icons';
 
 export default function Login() {
   const t = useTranslations('auth.login');
@@ -81,9 +88,7 @@ export default function Login() {
             {/* Logo and Title */}
             <div className="flex flex-col items-center mb-6">
               <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-white">
-                  <path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z" clipRule="evenodd" />
-                </svg>
+                <PlayIcon className="w-8 h-8 text-white" />
               </div>
               <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200">{t('title')}</h1>
               <p className="text-white/80 mt-2">Sign in to your Stream Challenge account</p>
@@ -92,9 +97,7 @@ export default function Login() {
             {/* Error Message */}
             {error && (
               <div className="alert alert-error mb-6 bg-opacity-20 backdrop-blur-md border-red-500/40">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <WarningIcon className="h-6 w-6 shrink-0 stroke-current" />
                 <span>{error}</span>
               </div>
             )}
@@ -107,10 +110,7 @@ export default function Login() {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-300" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                    </svg>
+                    <EmailIcon className="h-5 w-5 text-purple-300" />
                   </div>
                   <input
                     id="email"
@@ -130,9 +130,7 @@ export default function Login() {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-300" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
+                    <LockIcon className="h-5 w-5 text-purple-300" />
                   </div>
                   <input
                     id="password"
@@ -197,9 +195,7 @@ export default function Login() {
                   onClick={() => handleSocialLogin('twitch')}
                   className="btn btn-outline btn-ghost bg-white/5 hover:bg-white/10 border-white/10 text-white"
                 >
-                  <svg className="h-5 w-5 text-purple-400" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M11.571 4.714h1.715v5.143h-1.715zM16.571 4.714h1.715v5.143h-1.715zM2.857 0l-2.857 2.857v18.285h5.714v2.857h2.857l2.857-2.857h4.286l5.714-5.714v-15.428h-18.571zM20.571 14.571l-3.428 3.428h-5.714l-2.857 2.857v-2.857h-4.571v-14.286h16.571v10.857z" />
-                  </svg>
+                  <TwitchIcon className="h-5 w-5 text-purple-400" />
                   <span className="ml-2">Twitch</span>
                 </button>
               </div>

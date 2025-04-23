@@ -6,6 +6,12 @@ import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/utils/hooks/useAuth';
 import AppLayout from '@/app/components/AppLayout';
+import { 
+  PlayIcon, 
+  CheckmarkIcon, 
+  ClockTimeIcon, 
+  QuestionMarkIcon 
+} from '@/app/components/icons';
 
 export default function Home() {
   const t = useTranslations('home');
@@ -74,10 +80,7 @@ export default function Home() {
                   onClick={() => setShowVideo(!showVideo)} 
                   className="btn bg-white/20 backdrop-blur-md border border-white/30 hover:bg-white/30 text-white btn-lg transition-all duration-300 shadow-md"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 mr-2">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z" />
-                  </svg>
+                  <PlayIcon className="w-5 h-5 mr-2" />
                   {t('hero.watchVideo')}
                 </button>
               </div>
@@ -148,21 +151,15 @@ export default function Home() {
                 <p className="text-gray-600 mb-6">{t('features.pickMe.description')}</p>
                 <ul className="space-y-3">
                   <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <CheckmarkIcon className="h-6 w-6 text-purple-600 mr-2 mt-0.5" />
                     <span className="text-gray-700">{t('features.pickMe.feature1')}</span>
                   </li>
                   <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <CheckmarkIcon className="h-6 w-6 text-purple-600 mr-2 mt-0.5" />
                     <span className="text-gray-700">{t('features.pickMe.feature2')}</span>
                   </li>
                   <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-purple-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <CheckmarkIcon className="h-6 w-6 text-purple-600 mr-2 mt-0.5" />
                     <span className="text-gray-700">{t('features.pickMe.feature3')}</span>
                   </li>
                 </ul>
@@ -177,9 +174,7 @@ export default function Home() {
                     <Image src="/file.svg" alt="Challenge Me" width={36} height={36} className="text-white" />
                   </div>
                   <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-medium">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <ClockTimeIcon className="h-4 w-4 mr-1" />
                     {commonT('comingSoon')}
                   </span>
                 </div>
@@ -187,21 +182,15 @@ export default function Home() {
                 <p className="text-gray-600 mb-6">{t('features.challengeMe.description')}</p>
                 <ul className="space-y-3">
                   <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <CheckmarkIcon className="h-6 w-6 text-indigo-600 mr-2 mt-0.5" />
                     <span className="text-gray-700">{t('features.challengeMe.feature1')}</span>
                   </li>
                   <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <CheckmarkIcon className="h-6 w-6 text-indigo-600 mr-2 mt-0.5" />
                     <span className="text-gray-700">{t('features.challengeMe.feature2')}</span>
                   </li>
                   <li className="flex items-start">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600 mr-2 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+                    <CheckmarkIcon className="h-6 w-6 text-indigo-600 mr-2 mt-0.5" />
                     <span className="text-gray-700">{t('features.challengeMe.feature3')}</span>
                   </li>
                 </ul>
@@ -236,9 +225,7 @@ export default function Home() {
               {t('cta.primary')}
             </button>
             <button className="btn btn-lg bg-indigo-700/50 backdrop-blur-md border border-white/20 text-white hover:bg-indigo-700/80 transition-all duration-300">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-5 h-5 mr-2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
-              </svg>
+              <QuestionMarkIcon className="w-5 h-5 mr-2" />
               {t('cta.secondary')}
             </button>
           </div>
