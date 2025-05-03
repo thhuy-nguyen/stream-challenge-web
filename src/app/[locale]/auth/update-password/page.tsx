@@ -5,6 +5,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import { useTranslations } from 'next-intl';
+import { 
+  LockResetIcon, 
+  LockIcon, 
+  WarningIcon,
+  CheckCircleIcon
+} from '@/app/components/icons';
 
 export default function UpdatePassword() {
   const t = useTranslations('auth.updatePassword');
@@ -93,9 +99,7 @@ export default function UpdatePassword() {
             {/* Logo and Title */}
             <div className="flex flex-col items-center mb-6">
               <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8 text-white">
-                  <path fillRule="evenodd" d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5zm-10.5 7.5h15v-6.75a1.5 1.5 0 00-1.5-1.5h-12a1.5 1.5 0 00-1.5 1.5v6.75z" clipRule="evenodd" />
-                </svg>
+                <LockResetIcon className="w-8 h-8 text-white" />
               </div>
               <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-200">{t('title')}</h1>
               <p className="text-white/80 mt-2">{t('subtitle')}</p>
@@ -104,9 +108,7 @@ export default function UpdatePassword() {
             {/* Success Message */}
             {message && (
               <div className="alert alert-success mb-6 bg-opacity-20 backdrop-blur-md border-green-500/40">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <CheckCircleIcon className="h-6 w-6 shrink-0 stroke-current" />
                 <span>{message}</span>
               </div>
             )}
@@ -114,9 +116,7 @@ export default function UpdatePassword() {
             {/* Error Message */}
             {error && (
               <div className="alert alert-error mb-6 bg-opacity-20 backdrop-blur-md border-red-500/40">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 shrink-0 stroke-current" fill="none" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <WarningIcon className="h-6 w-6 shrink-0 stroke-current" />
                 <span>{error}</span>
               </div>
             )}
@@ -129,9 +129,7 @@ export default function UpdatePassword() {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-300" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
+                    <LockIcon className="h-5 w-5 text-purple-300" />
                   </div>
                   <input
                     id="password"
@@ -152,9 +150,7 @@ export default function UpdatePassword() {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-300" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
+                    <LockIcon className="h-5 w-5 text-purple-300" />
                   </div>
                   <input
                     id="confirmPassword"

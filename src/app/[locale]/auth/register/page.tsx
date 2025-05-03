@@ -197,9 +197,7 @@ export default function Register() {
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-300" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
+                    <LockIcon className="h-5 w-5 text-purple-300" />
                   </div>
                   <input
                     id="password"
@@ -245,9 +243,7 @@ export default function Register() {
                   onClick={() => handleSocialSignUp('twitch')}
                   className="btn btn-outline btn-ghost bg-white/5 hover:bg-white/10 border-white/10 text-white"
                 >
-                  <svg className="h-5 w-5 text-purple-400" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M11.571 4.714h1.715v5.143h-1.715zM16.571 4.714h1.715v5.143h-1.715zM2.857 0l-2.857 2.857v18.285h5.714v2.857h2.857l2.857-2.857h4.286l5.714-5.714v-15.428h-18.571zM20.571 14.571l-3.428 3.428h-5.714l-2.857 2.857v-2.857h-4.571v-14.286h16.571v10.857z" />
-                  </svg>
+                  <TwitchIcon className="h-5 w-5 text-purple-400" />
                   <span className="ml-2">Twitch</span>
                 </button>
               </div>

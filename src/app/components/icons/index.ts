@@ -33,6 +33,7 @@ export { default as DocumentIcon } from './DocumentIcon';
 export { default as LinkExternalIcon } from './LinkExternalIcon';
 export { default as EmailIcon } from './EmailIcon';
 export { default as LockIcon } from './LockIcon';
+export { default as LockResetIcon } from './LockResetIcon';
 export { default as PlayIcon } from './PlayIcon';
 export { default as CubeIcon } from './CubeIcon';
 export { default as MailboxIcon } from './MailboxIcon';
